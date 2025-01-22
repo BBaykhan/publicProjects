@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<head>
+  <title>Cash Register by Bob</title>
+  <meta name="viewport" content="width=device-width, position-sacle=1" />
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <img id="background" src="https://i.ibb.co/312kfXj/monitor.png" alt="cashier machine"/>
+  <div id="whiteScrn"></div>
+  <table id="numbers">
+    <tr>
+      <td>7</td>
+      <td>8</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>5</td>
+      <td>6</td>
+    </tr><tr>
+      <td>1</td>
+      <td>2</td>
+      <td>3</td>
+    </tr>
+  </table>
+  <div id="priceDiv">
+    <p id="priceText">Total:</p>
+    <p id="price-screen">19.5</p>
+  </div>
+  <p id="cash-drawer-display">Change left in the drawer</p>
+ 
+  <p id="change-due">Change</p>
+  <form>
+    <input id="cash" type="number" min="0"/>
+    <p id="dollar">$</p>
+    <p id="change-due"></p>
+    <button id="purchase-btn">Checkout</button>
+  </form>
+<script src="script.js"></script>
+</body>
+</html>

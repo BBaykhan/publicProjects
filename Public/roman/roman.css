@@ -1,0 +1,58 @@
+body {
+    padding: 0;
+    margin: 0;
+  }
+  #background {
+    background-color: #66ccff;
+    height:100vh;
+    width:100wh;
+    display: flex;
+    justify-content: center;
+    padding-top: 40vh;
+  }
+  #holder {
+    /* border: 1px solid #006699; */
+    background-color:#0077b3;
+    opacity: 0.9;
+    max-width: 25vw;
+    min-width:25vw;
+    max-height: 20vh;
+    min-height: 20vh;
+    border-radius: 3rem;
+    box-shadow: 10px 20px 25px #00223370; 
+  }
+  #number {
+    width: 18vw;
+    height: 4vh;
+    margin: 2.5vh auto 0;
+    display: block;
+    border-radius: 1vh;
+    text-align: center;
+    border: none;
+  }
+  #check-btn {
+    width:5vw;
+    height: 3.5vh;
+    margin: 1.5vh auto 0;
+    display:block;
+    cursor: pointer;
+    font-family: cursive;
+    font-size: 1vw;
+    border-radius: 5px;
+    border: none;
+  }
+  #result {
+    /* border: 1px solid black; */
+    width: 20vw;
+    height: 5vh;
+    color: white;
+    position: relative;
+    left: 13%;
+    top: 1vh;
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+  }
+  fieldset {
+    border: none;
+  }

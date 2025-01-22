@@ -1,0 +1,371 @@
+Sub DownloadFiles()
+    Dim driver As New Selenium.WebDriver
+    Dim checkboxes As Object
+    Dim checkbox As Object
+    Dim totalRows As Long
+    Dim maxRowsLimit As Long
+    Dim fileRows As Long
+    Dim URL As String
+    Dim Username As String
+    Dim Password As String
+    Dim WebDriverPath As String
+    Dim pid As String
+    Dim wb As Workbook
+    Dim csvWB As Workbook
+    
+    ' Edge WebDriver
+    WebDriverPath = Range("G10").Value
+
+    
+    Username = Range("D10").Value
+    Password = Range("D11").Value
+    
+    pid = StartEdgeDriver(DriverPath:=WebDriverPath)
+    Set driver = CreateObject("Selenium.WebDriver")
+
+    driver.StartRemotely "http://localhost:17556/", "MicrosoftEdge"
+  
+    ' Visit the website
+    URL = "???"
+    driver.Get URL
+
+    ' Enter username and password in the login form and submit
+    driver.FindElementByClass("submit-button").Click
+
+    ' Open the product management screen
+    driver.Get "https://hea.nexlink.biz/content/facsimiles"
+
+    ' Press the Advanced search button
+    Dim detailTags As Object
+    Set detailTags = driver.FindElementsByTag("a")
+    
+    For Each Tag In detailTags
+        If Tag.Text = "???" Then
+            Tag.Click
+            Exit For
+        End If
+    Next Tag
+
+    driver.FindElementById("search_period_between").Click
+    
+    ' Get the date value from cell E5
+    Dim today As String
+    today = Range("C14").Value
+    
+    driver.FindElementById("search_from").Click
+    
+    ' Get all the <td> elements within the calendar for 'from' date
+    Dim fromDates As Object
+    Set fromDates = driver.FindElementsByTag("a")
+    
+    For Each Tag In fromDates
+        If Tag.Text = today Then
+            Tag.Click
+            Exit For
+        End If
+    Next Tag
+        
+    ' Get the date value from cell F5
+    Dim tomorrow As String
+    tomorrow = Range("C14").Value
+
+    driver.FindElementById("search_to").Click
+    
+    ' Get all the <td> elements within the calendar for 'to' date
+    Dim toDates As Object
+    Set toDates = driver.FindElementsByTag("a")
+    
+    For Each Tag In toDates
+        If Tag.Text = tomorrow Then
+            Tag.Click
+            Exit For
+        End If
+    Next Tag
+    
+    driver.FindElementById("search_button").Click
+    driver.Wait 300
+    
+   Do
+        ' Find all checkboxes
+        Set checkboxes = driver.FindElementsByCss(".download-select-block__button")
+        ' Track the number of checkboxes processed
+        Dim checkboxesProcessed As Integer
+        checkboxesProcessed = 0
+        For Each checkbox In checkboxes
+            ' Click the checkbox to select the file
+            checkbox.Click
+            Application.Wait Now + TimeValue("00:00:03")
+            ' Find and click on the tag with text containing download link
+            Set detailTags = driver.FindElementsByTag("a")
+            For Each Tag In detailTags
+                ' Example condition to find the download link based on tag text
+                If Tag.Text = "‘S‚Ä" Then
+                    ' Open link in new tab using JavaScript
+                    driver.ExecuteScript "window.open('" & Tag.Attribute("href") & "','_blank');"
+                    Exit For ' Exit the loop once found and clicked
+                End If
+            Next Tag
+            ' Increment the count of checkboxes processed
+            checkboxesProcessed = checkboxesProcessed + 1
+            ' Exit the loop if all checkboxes have been processed
+            If checkboxesProcessed = checkboxes.Count Then Exit Do
+        Next checkbox
+        ' Optionally, you can add a wait or other actions here if needed
+    Loop
+     
+    ' Wait for 10 minutes (600 seconds) for downloads to complete
+    Application.Wait Now + TimeValue("00:00:10")
+    
+     
+     ' Create a new folder inside the Downloads folder with the current timestamp
+    Dim newFolder As String
+    newFolder = Environ("USERPROFILE") & "\Downloads\" & Format(Now, "yyyy-mm-dd_hh-nn-ss")
+    MkDir newFolder
+    
+   ' Move downloaded files to the new folder
+    Dim fileSystem As Object
+    Set fileSystem = CreateObject("Scripting.FileSystemObject")
+    Dim file As Object
+    For Each file In fileSystem.GetFolder(Environ("USERPROFILE") & "\Downloads").Files
+        ' Move only files downloaded during this session
+        If file.DateCreated > DateAdd("s", -150, Now) Then
+            file.Move newFolder & "\" & file.Name
+        End If
+    Next file
+    
+    ' Create a new folder named "matome" inside the newFolder
+    Dim matomeFolder As String
+    matomeFolder = newFolder & "\matome"
+    MkDir matomeFolder
+    
+    ' Combine CSV files into one
+    Dim combinedCSV As String
+    combinedCSV = matomeFolder & "\" & currentDate & " Main Data.csv"
+    Dim outputFile As Object
+    Set outputFile = fileSystem.CreateTextFile(combinedCSV, True)
+    
+    Dim firstFile As Boolean
+    firstFile = True
+    
+    Dim ts As Object
+    For Each file In fileSystem.GetFolder(newFolder).Files
+        If fileSystem.GetExtensionName(file.Path) = "csv" Then
+            Set ts = fileSystem.OpenTextFile(file.Path, 1)
+            If firstFile Then
+                outputFile.WriteLine ts.ReadAll
+                firstFile = False
+            Else
+                ' Skip header row for subsequent files
+                ts.ReadLine
+                outputFile.WriteLine ts.ReadAll
+            End If
+            ts.Close
+        End If
+    Next file
+   
+   outputFile.Close
+   
+   ' Create a copy of the combined CSV file
+    Dim copiedFileName As String
+    copiedFileName = matomeFolder & "\" & Format(Date, "yyyy-mm-dd") & " PBI.csv"
+    
+    FileCopy combinedCSV, copiedFileName
+    
+   
+   
+   
+   
+    ' Close Edge driver and terminate Edge process
+    driver.Quit
+    TerminateEdgeDriver pid
+
+
+
+
+
+   ' Open the combined CSV file in Excel
+    Set wb = Workbooks.Open(combinedCSV)
+    
+  ' Check if workbook is successfully opened
+    If Not wb Is Nothing Then
+    ' Clear any existing content in "Fax Number" sheet or create if it doesn't exist
+    On Error Resume Next
+    Dim wsFaxNumber As Worksheet
+    Set wsFaxNumber = wb.Sheets("Fax Number")
+    On Error GoTo 0
+    
+    If wsFaxNumber Is Nothing Then
+        ' Sheet doesn't exist, create it
+        Set wsFaxNumber = wb.Sheets.Add(After:=wb.Sheets(wb.Sheets.Count))
+        wsFaxNumber.Name = "Fax Number"
+    Else
+        ' Clear existing content if sheet already exists
+        wsFaxNumber.Cells.Clear
+    End If
+    
+    ' Copy data from "Main Data" to "Fax Number" sheet
+    wb.Sheets(1).UsedRange.Copy wsFaxNumber.Cells(1, 1)
+    
+    ' Activate or select the "Fax Number" sheet
+    wsFaxNumber.Activate ' or wsFaxNumber.Select
+    
+   ' Set column widths
+    wsFaxNumber.Columns("I").ColumnWidth = 18
+    wsFaxNumber.Columns("J").ColumnWidth = 18
+    wsFaxNumber.Columns("K").ColumnWidth = 18
+    
+    ' Set headers for the new table
+    wsFaxNumber.Range("I9").Value = "‘—’B“ú"
+    wsFaxNumber.Range("J9").Value = "ƒXƒe[ƒ^ƒX"
+    wsFaxNumber.Range("K9").Value = "FAX‚ÌƒJƒEƒ“ƒg"
+    
+    ' Find the last row with data in column H
+    Dim lastRow As Long
+    lastRow = wsFaxNumber.Cells(wsFaxNumber.Rows.Count, "H").End(xlUp).Row
+    
+    ' Dictionary to hold counts
+    Dim dict As Object
+    Set dict = CreateObject("Scripting.Dictionary")
+    
+    ' Check for valid rows and count based on the criteria
+    If lastRow >= 2 Then
+        Dim rng As Range, dictKey As String
+        For Each rng In wsFaxNumber.Range("H2:H" & lastRow)
+            ' Check if rng is a valid object and has the expected value
+            If Not rng Is Nothing And rng.Value = "‘—’B" Then
+                Dim cellValue As Variant
+                cellValue = wsFaxNumber.Cells(rng.Row, "G").Value
+                
+                ' Check if cellValue is not empty or an error
+                If Not IsEmpty(cellValue) And Not IsError(cellValue) Then
+                    dictKey = cellValue & "|‘—’B"
+                    If dict.Exists(dictKey) Then
+                        dict(dictKey) = dict(dictKey) + 1
+                    Else
+                        dict.Add dictKey, 1
+                    End If
+                End If
+            End If
+        Next rng
+    Else
+        MsgBox "No valid data found in column H.", vbExclamation
+    End If
+    
+    
+   ' Clear all other cells except I9:K10
+    wsFaxNumber.Range("A1:H1048576").Clear
+    wsFaxNumber.Range("L1:XFD1048576").Clear
+    wsFaxNumber.Range("I1:I8").Clear
+    wsFaxNumber.Range("J1:J8").Clear
+    wsFaxNumber.Range("K1:K8").Clear
+    wsFaxNumber.Range("I11:I1048576").Clear
+    wsFaxNumber.Range("J11:J1048576").Clear
+    wsFaxNumber.Range("K11:K1048576").Clear
+    
+    
+    ' Output the results in the specified format
+    Dim rowIndex As Long
+    rowIndex = 10 ' Starting row index
+    
+    For Each key In dict.Keys
+        If Not wsFaxNumber Is Nothing Then
+            ' Populate data into wsFaxNumber
+            wsFaxNumber.Cells(rowIndex, 9).Value = Split(key, "|")(0) ' Extracts the date part from the key
+            wsFaxNumber.Cells(rowIndex, 10).Value = "‘—’B" ' Sets the status to 'e?fB'
+            wsFaxNumber.Cells(rowIndex, 11).Value = dict(key) ' Number of occurrences
+            rowIndex = rowIndex + 1
+        Else
+            MsgBox "Worksheet 'Fax Number' is not set or accessible.", vbExclamation
+            Exit For
+        End If
+    Next key
+    
+    ' Format column I to show only date
+    wsFaxNumber.Columns("I").NumberFormat = "yyyy-mm-dd"
+    
+    ' Clear filters and any remaining AutoFilter
+    'If wsFaxNumber.FilterMode Then wsFaxNumber.ShowAllData
+    
+    ' Save and close the workbook
+   ' wb.Save
+   ' wb.Close
+    Else
+    MsgBox "Failed to open the workbook.", vbExclamation
+    End If
+End Sub
+
+'‘—’B
+'‘—’B“ú
+'ƒXƒe[ƒ^ƒX
+'FAX‚ÌƒJƒEƒ“ƒg
+
+Private Sub SetDate(driver As Object, targetDate As String, idPrefix As String)
+    ' Get all <td> elements within the calendar for 'from' date
+    Dim dates As Object
+    Set dates = driver.FindElementsByTag("a")
+    
+    For Each Tag In dates
+        If Tag.Text = targetDate Then
+            Tag.Click
+            Exit For
+        End If
+    Next Tag
+End Sub
+
+Private Function StartEdgeDriver( _
+    ByVal DriverPath As String, _
+    Optional ByVal PortNo As Long = 17556) As Long
+   
+    Dim DriverFolderPath As String
+    Dim DriverName As String
+    Dim Options As String
+    Dim itm As Object, itms As Object
+    Dim pid As Long: pid = 0
+   
+    With CreateObject("Scripting.FileSystemObject")
+        If .fileExists(DriverPath) = False Then GoTo Fin
+        DriverFolderPath = .GetParentFolderName(DriverPath)
+        DriverName = .GetFileName(DriverPath)
+    End With
+    
+    ' Check for multiple instances
+    Set itms = CreateObject("WbemScripting.SWbemLocator").ConnectServer.ExecQuery _
+              ("Select * From Win32_Process Where Name = '" & DriverName & "'")
+    If itms.Count > 0 Then
+        For Each itm In itms
+            pid = itm.ProcessId: GoTo Fin
+        Next
+    End If
+   
+    ' Start WebDriver
+    Options = " --host=localhost --jwp --port=" & PortNo
+    With CreateObject("WbemScripting.SWbemLocator").ConnectServer.Get("Win32_Process")
+        .Create DriverPath & Options, DriverFolderPath, Null, pid
+    End With
+   
+Fin:
+    StartEdgeDriver = pid
+End Function
+
+Private Sub TerminateEdgeDriver(ByVal ProcessId As Long)
+    Dim itm As Object, itms As Object
+    
+    Set itms = CreateObject("WbemScripting.SWbemLocator").ConnectServer.ExecQuery _
+              ("Select * From Win32_Process Where ProcessId = " & ProcessId & "")
+    If itms.Count > 0 Then
+        For Each itm In itms
+            itm.Terminate: Exit For
+        Next
+    End If
+End Sub
+
+Private Function clickButton(ByVal tagName As String, ByVal targetText As String)
+    Set targetTags = driver.FindElementsByTagName(tagName)
+    For Each Tag In targetTags
+        If Tag.Text = targetText Then
+            Tag.Click
+            Exit For
+        End If
+    Next Tag
+End Function
+

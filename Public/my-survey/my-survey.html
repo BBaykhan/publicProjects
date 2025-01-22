@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>My Questionary</title>
+		<link rel="stylesheet" href="my-survey.css" />
+	</head>
+	<body>
+		<div id="main">
+			<div class="div1">
+				<h1 id="title">My Questionary</h1>
+				<p id="description"> I made this questionary just for fun. I had no work to do at work, so I made this because I was bored.</p>
+			</div>
+			<div class="div2">
+				<form id="survey-form">
+					<fieldset id="fieldset1">
+						<label id="name-label" for="name">How should I call you?
+							<input id="name" name="name" type="text" placeholder="Sweet Potato" autocomplete="off" required="required" />
+						</label>
+						<label id="email-label" for="email">Where should I send my memes?
+							<input id="email" name="email" type="email" autocomplete="off" placeholder="how@are.you" required="required" />
+						</label>
+						<label id="number-label" for="number">How many years past since your  first time shit?
+							<input id="number" name="age" type="number" min="16" max="199" placeholder="18" required="required" />
+						</label>
+						<label for="dropdown" id="dropdown-label">Do you want some cookies?
+              
+							<select id="dropdown">
+								<option>Yes</option>
+								<option>No</option>
+								<option>What's the catch?</option>
+							</select>
+						</label>
+					</fieldset>
+					<fieldset class="fieldset2">
+						<legend>
+                Why are you gay?
+              </legend>
+						<label  for="radio1">
+							<input id="radio1" class="inline" name="radio" type="radio" value="1" />
+                        Who said I'm gay?
+                      
+						</label>
+						<label  for="radio2">
+							<input id="radio2" class="inline" name="radio" type="radio" value="2" checked="checked" />
+                        Have problems?
+                      
+						</label>
+						<label for="radio3">
+							<input id="radio3" class="inline" name="radio" type="radio" value="3" />
+                        I'm not
+                      
+						</label>
+					</fieldset>
+					<fieldset class="fieldset2">
+						<legend>
+                    What food you wanna eat?
+              </legend>
+						<label  for="checkbox1">
+							<input id="checkbox1" class="inline" name="radio" type="checkbox" value="1" />
+                          Ramen
+                        
+						</label>
+						<label  for="checkbox2">
+							<input id="checkbox2" class="inline" name="radio" type="checkbox" value="2" checked="checked" />
+                          Pizza
+                  
+						</label>
+					</fieldset>
+					<p class="dontcare">
+                Write your reviews of my work, which I definitely will not read and care about, here.
+              </p>
+					<textarea id="textarea" rows="5" cols="20" placeholder="I will sue you"></textarea>
+					<input id="submit" name="submit" type="submit" />
+				</form>
+			</div>
+		</div>
+	</body>
+</html>

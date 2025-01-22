@@ -1,0 +1,398 @@
+Sub Click_Me_Fax_Management()
+
+Dim driver As New Selenium.WebDriver
+Dim WebDriverPath As String
+Dim userName As String
+Dim Password As String
+Dim pid As String
+Dim attempts As Integer
+Dim maxAttempts As Integer
+Dim elementFound As Boolean
+
+' Location of login info and webdriver
+    WebDriverPath = Range("Q15").Value
+    
+'    pid = StartEdgeDriver(DriverPath:=WebDriverPath)
+'    Set driver = CreateObject("Selenium.WebDriver")
+
+'    driver.StartRemotely "http://localhost:17556/", "MicrosoftEdge"
+'
+'
+'    ' Initialize variables
+'    attempts = 0
+'    maxAttempts = 3 ' Number of attempts before giving up
+'    elementFound = False
+'
+'    ' Try to load the URL and check if the input field is available
+'    Do While attempts < maxAttempts And Not elementFound
+'        On Error Resume Next
+'        Url = "???"
+'        driver.Get Url
+'        Application.Wait Now + TimeValue("00:00:02") ' Wait for the page to load
+'
+'        ' Try to find the email input field
+'        If Not driver.FindElementByXPath("//input[@placeholder='ƒ[ƒ‹ƒAƒhƒŒƒX']") Is Nothing Then
+'            ' Only send keys if the element is found
+'            driver.FindElementByXPath("//input[@placeholder='ƒ[ƒ‹ƒAƒhƒŒƒX']").SendKeys userName
+'            elementFound = True ' If found, set the flag to true
+'        Else
+'            ' If not found, refresh the page and wait
+'            driver.Refresh
+'            attempts = attempts + 1
+'            Application.Wait Now + TimeValue("00:00:05") ' Wait for another 5 seconds
+'        End If
+'        On Error GoTo 0
+'    Loop
+'
+'    ' Check if the email input was successfully found
+'    If Not elementFound Then
+'        MsgBox "Failed to find the email input after " & maxAttempts & " attempts."
+'        Exit Sub
+'    End If
+'
+'
+'
+'    ' Enter username and password in the login form and submit
+'    driver.FindElementByXPath("//input[@placeholder='ƒpƒXƒ[ƒh']").SendKeys Password
+'    driver.FindElementByXPath("//span[text()='ƒƒOƒCƒ“']").Click
+'
+'    Application.Wait Now + TimeValue("00:00:03")
+'
+''===============================================================================================================================
+'    'Opening settings page and opening xlsx file
+'
+'    ' Using JavaScript to open the URL in a new tab
+'    driver.ExecuteScript "window.open('http://13.230.123.114/facsimiles/add', '_blank');"
+    
+    
+    Dim folderPath As String
+    Dim xlsxFile As String
+    Dim Workbook As Object
+    Dim sheetName As String
+    Dim filterSheet As Worksheet
+    Dim dateValue As Date
+    Dim dayOfWeek As String
+    Dim weekOfMonth As Integer
+    Dim monthValue As Integer
+    Dim dayValue As Integer
+    Dim dayNames As Variant
+    Dim weekArray As Variant
+    Dim lastRow As Long
+    Dim uniqueCategories As Object
+    Dim currentCategory As String
+    Dim i As Long
+    Dim inputField As Object
+    
+    On Error Resume Next
+    Set oExcel = GetObject(, "Excel.Application")  ' Attach to the running instance
+    On Error GoTo 0
+    
+    If oExcel Is Nothing Then
+        ' If no instance is found, create a new one
+        Set oExcel = CreateObject("Excel.Application")
+    End If
+    oExcel.Visible = True  ' Set to True if you want to see Excel
+
+    
+     ' 1. Get the folder path of the VBA file
+    folderPath = ThisWorkbook.Path & "\/??
+
+
+    ' 2. Get the values from H11 (month) and O11 (day)
+    monthValue = Range("H11").Value
+    dayValue = Range("O11").Value
+    dateValue = DateSerial(Year(Date), monthValue, dayValue)
+
+
+    ' 3. Get the day of the week and the week of the month
+    dayNames = Array("“ú", "ŒŽ", "‰Î", "…", "–Ø", "‹à", "“y")
+    dayOfWeek = dayNames(Weekday(dateValue, vbSunday) - 1)
+    weekOfMonth = Application.WorksheetFunction.RoundUp(Day(dateValue) / 7, 0)
+
+'' Debugging: Confirm sheet name selection
+'    MsgBox "Day of the week: " & dayOfWeek & vbCrLf & "Week of the month: " & weekOfMonth
+
+    ' 4. Getting XLSX file name
+    xlsxFile = Dir(folderPath & "*.xlsx")
+
+    ' 5. Open the workbook
+    If xlsxFile <> "" Then
+        Set Workbook = oExcel.Workbooks.Open(folderPath & xlsxFile, ReadOnly:=False)
+    Else
+        MsgBox "XLSX file not found in " & folderPath
+        Exit Sub
+    End If
+
+    ' 6. Find the sheet based on the day of the week
+    On Error Resume Next
+    Set filterSheet = Workbook.Sheets(dayOfWeek)
+    On Error GoTo 0
+
+    If filterSheet Is Nothing Then
+        MsgBox "Sheet for " & dayOfWeek & " not found in the file."
+        Workbook.Close False
+        Exit Sub
+    End If
+
+'' Debugging: Confirm sheet name selection
+'    MsgBox "Sheet selected: " & dayOfWeek
+
+     ' 7. Apply filter to column F based on the week of the month
+    filterSheet.Activate
+
+    filterSheet.AutoFilterMode = False
+
+     ' Get the last row of the data in column F (assuming data is continuous in column F)
+    lastRow = filterSheet.Cells(filterSheet.Rows.Count, "F").End(xlUp).Row
+
+
+    ' Apply the filter based on the week of the month
+    If weekOfMonth = 1 Then
+        ' Show all weeks (no filter applied)
+        filterSheet.Range("A1:F" & lastRow).AutoFilter Field:=6
+    Else
+        ' Apply filter to deselect previous weeks
+        filterSheet.Range("A1:F" & lastRow).AutoFilter Field:=6, Criteria1:=">=" & weekOfMonth, Operator:=xlFilterValues
+    End If
+
+'    MsgBox "Filtered successfully for week " & weekOfMonth
+
+    Dim categories As Variant
+    Dim category As Variant
+    Dim visibleRow As Range
+    
+    ' Define the categories to check
+'    categories = Array( _
+'        "”_‹ÆC—Ñ‹Æ", _
+'        "‹™‹Æ", _
+'        "ŒšÝ‹Æ", _
+'        "‰^—A‹Æ —X•Ö‹Æ", _
+'        "»‘¢‹Æ", _
+'        "‰µ”„‹Æ ¬”„‹Æ", _
+'        "z‹Æ ÌÎ‹Æ", _
+'        "“d‹C", _
+'        "ˆã—ÃC•ŸŽƒ", _
+'        "h”‘‹Æ", _
+'        "ˆùH‹Æ", _
+'        "¶ŠˆŠÖ˜A ƒT[ƒrƒX‹Æ", _
+'        "‹³ˆçCŠwKŽx‰‡‹Æ", _
+'        "‚»‚Ì‘¼" _
+'    )
+
+    categories = Array( _
+        "”_‹ÆC—Ñ‹Æ", _
+        "ŒšÝ‹Æ", _
+        "‰^—A‹ÆC—X•Ö‹Æ", _
+        "»‘¢‹Æ", _
+        "‰µ”„‹ÆC¬”„‹Æ", _
+        "z‹ÆCÌÎ‹ÆC»—˜ÌŽæ‹Æ", _
+        "“d‹CEƒKƒXE”M‹Ÿ‹‹E…“¹‹Æ", _
+        "ˆã—ÃC•ŸŽƒ", _
+        "h”‘‹ÆCˆùHƒT[ƒrƒX‹Æ", _
+        "ˆùH‹Æ", _
+        "¶ŠˆŠÖ˜AƒT[ƒrƒX‹ÆCŒâŠy‹Æ", _
+        "‹³ˆçCŠwKŽx‰‡‹Æ", _
+        "‚»‚Ì‘¼" _
+    )
+   ' Assuming filterSheet is already set to your target worksheet
+    lastRow = filterSheet.Cells(filterSheet.Rows.Count, 1).End(xlUp).Row
+    
+    ' Store the name of the current sheet
+    currentSheetName = filterSheet.Name
+
+    ' Loop through each specified category
+    For Each category In categories
+    
+        ' Clear existing filters if any
+        If filterSheet.AutoFilterMode Then filterSheet.AutoFilterMode = False
+        
+        Dim visibleCells As Range
+        Dim visibleCellAddresses As String
+        
+        ' Apply filter for the current category
+        filterSheet.Range("A1").AutoFilter Field:=1, Criteria1:=category
+        
+        ' Check if there are visible rows after filtering
+        On Error Resume Next
+        Set visibleRow = filterSheet.Range("A2:A" & lastRow).SpecialCells(xlCellTypeVisible)
+        On Error GoTo 0
+        
+        ' If there are visible cells, store their addresses
+        If Not visibleCells Is Nothing Then
+            visibleCellAddresses = visibleCells.Address
+            ' Save the visible cell addresses to a text file (overwrite each time)
+            WriteToTextFile visibleCellAddresses, ThisWorkbook.Path & "\visibleRows.txt"
+        End If
+        
+        ' If there are visible rows, process the data
+        If Not visibleRow Is Nothing Then
+             ' Save and close the workbook to allow AutoHotkey access
+            filterSheet.Parent.Save  ' Save the workbook
+            filterSheet.Parent.Close False  ' Close the workbook without prompting
+            
+            
+            Dim ahkFilePath As String
+    
+    
+            ' Specify the full path to the AutoHotkey script
+            ahkFilePath = """C:\Users\ƒ{ƒCƒRƒmƒ”ƒ{ƒrƒ‹ƒWƒ‡ƒ“\Documents\AutoHotkey\new.exe"""
+    
+    
+           ' Run the AutoHotkey script
+            Shell ahkFilePath, vbNormalFocus
+    
+    
+            Application.Wait Now + TimeValue("00:01:00")
+             
+            ' After the wait, re-open the workbook and continue with the next category
+            Set Workbook = oExcel.Workbooks.Open(folderPath & xlsxFile, ReadOnly:=False)
+            
+            ' Re-select the sheet that was previously filtered
+            Set filterSheet = Workbook.Sheets(currentSheetName)
+'
+'             ' Reapply the filter to continue with the current category
+'            filterSheet.Range("A1").AutoFilter Field:=1, Criteria1:=category
+                
+        End If
+        
+         ' Clear the filter after processing
+        filterSheet.AutoFilterMode = False
+        
+    Next category
+
+    ' Clear filters when done
+    filterSheet.AutoFilterMode = False
+
+
+
+'===============================================================================================================================
+    'Copy from excel and paste on website
+    
+    
+    ' Filter each category in Column A one by one
+    
+    
+'
+'    lastRow = filterSheet.Cells(filterSheet.Rows.Count, 1).End(xlUp).Row
+'
+'    ' Get the first category from Column A
+'    currentCategory = filterSheet.Cells(2, 1).Value ' Assuming the first category is in row 2
+'
+'    ' Apply filter for the first category
+'    filterSheet.Range("A1:F" & lastRow).AutoFilter Field:=1, Criteria1:=currentCategory
+'
+'
+'
+'
+                
+                
+                
+                
+                ' Optional wait for the action to complete (adjust based on how fast the web page responds)
+                Application.Wait Now + TimeValue("00:00:05") ' Wait for 2 seconds after sending keys
+'            End If
+'        Next i
+'    End If
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    Application.Wait Now + TimeValue("00:00:05")
+    
+    driver.Quit
+    TerminateEdgeDriver pid
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+End Sub
+
+
+Private Function clickButton(ByVal tagName As String, ByVal targetText As String)
+    Set targetTags = driver.FindElementsByTagName(tagName)
+    For Each Tag In targetTags
+        If Tag.Text = targetText Then
+            Tag.Click
+            Exit For
+        End If
+    Next Tag
+End Function
+
+
+Private Function StartEdgeDriver( _
+    ByVal DriverPath As String, _
+    Optional ByVal PortNo As Long = 17556) As Long
+   
+    Dim DriverFolderPath As String
+    Dim DriverName As String
+    Dim Options As String
+    Dim itm As Object, itms As Object
+    Dim pid As Long: pid = 0
+   
+    With CreateObject("Scripting.FileSystemObject")
+        If .FileExists(DriverPath) = False Then GoTo Fin
+        DriverFolderPath = .GetParentFolderName(DriverPath)
+        DriverName = .GetFileName(DriverPath)
+    End With
+    
+    ' Check for multiple instances
+    Set itms = CreateObject("WbemScripting.SWbemLocator").ConnectServer.ExecQuery _
+              ("Select * From Win32_Process Where Name = '" & DriverName & "'")
+    If itms.Count > 0 Then
+        For Each itm In itms
+            pid = itm.ProcessId: GoTo Fin
+        Next
+    End If
+   
+    ' Start WebDriver
+    Options = " --host=localhost --jwp --port=" & PortNo
+    With CreateObject("WbemScripting.SWbemLocator").ConnectServer.Get("Win32_Process")
+        .Create DriverPath & Options, DriverFolderPath, Null, pid
+    End With
+   
+Fin:
+    StartEdgeDriver = pid
+End Function
+
+Private Sub TerminateEdgeDriver(ByVal ProcessId As Long)
+    Dim itm As Object, itms As Object
+    
+    Set itms = CreateObject("WbemScripting.SWbemLocator").ConnectServer.ExecQuery _
+              ("Select * From Win32_Process Where ProcessId = " & ProcessId & "")
+    If itms.Count > 0 Then
+        For Each itm In itms
+            itm.Terminate: Exit For
+        Next
+    End If
+End Sub
+

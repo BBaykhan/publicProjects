@@ -1,0 +1,188 @@
+@media (prefers-reduced-motion: no-preference) {
+    * {
+      scroll-behavior: smooth;
+    }
+}
+
+*,
+*::before,
+*::after {
+box-sizing: border-box;
+margin: 0;
+padding: 0;
+}
+
+html {
+    max-height: 70vh;
+}
+
+body {
+    text-align: center;
+    max-height: 60vh;
+}
+
+#quote-box {
+    background-color: #482cb8;
+    display: inline-block;
+    margin: 200px auto 0;
+    border-radius: 10px;
+    height: 400px;
+    width: 600px;
+    padding: 15px;
+}
+
+#back-white {
+    background-color: white;
+    border-radius: 10px;
+}
+
+#text {
+    border-radius: 10px 10px 0 0;
+    background-color: white;
+    min-height: 150px;
+    max-height: 290px;
+    width: 99%;
+}
+
+#author {
+    border-radius: 0 0 10px 10px;
+    background-color: white;
+    padding: 5px 20px 0 0;
+    padding-right: 60px;
+    text-align: right;
+    height: 50px;
+    width: 99%;
+}
+
+#quote, #author {
+    transition: transform 0.8s ease, background-color 0.8s ease;
+    transform-style: preserve-3d;
+    display: inline-block;
+}
+
+.quote {
+    font-weight: 800;
+    font-size: 60px;
+    height: 50px;
+}
+
+.quote1 {
+    padding-left: 20px;
+    margin-bottom: 5px;
+    text-align: left; 
+}
+
+.quote2 {
+    text-align: right;
+    padding-right: 20px;
+}
+
+#quote {
+    background-color: white;
+    font-style: italic;
+    max-height: 200px;
+    font-size: 40px;
+    padding: 0 20px;
+    top: 50%;
+}
+
+#new-quote {
+    transition: transform 0.8s ease;
+    position: relative;
+}
+
+.flip {
+    transform: rotateX(360deg);
+}
+
+#author {
+    padding-bottom: 5px;
+    font-style: italic;
+    font-weight: 200;
+    font-size: 30px;
+}
+
+#handle-div {
+    display: inline-block;
+    position: fixed;
+    left: 750px;
+    width: 20px;
+    height: 5px;
+    top: 205px;   
+}
+
+#handle {
+    border-radius: 30px;
+    position: relative;
+    height: 60px;
+    z-index: 10;
+    width: 60px;
+    left: 325px;
+    top: 80px;
+}
+
+#handle-body {
+    border-radius: 0 10px 10px 0;
+    background-color: #4127a8;
+    position: relative;
+    height: 300px;
+    bottom: 15px;
+    width: 80px;
+    left: 315px;
+    z-index: 8;
+}
+
+#handle-hole {
+    background-color: black;
+    border-radius: 10px;
+    position: relative;
+    height: 250px;
+    bottom: 290px;
+    left: 345px;
+    width: 20px;
+    z-index: 9;
+}
+
+#new-quote {
+    background: radial-gradient(circle at 30% 30%, #ff4d4d, #cc0000, #660000);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4); 
+    transition: transform 0.8s ease;
+    border-radius: 40px;
+    position: relative;
+    height: 60px;
+    width: 60px;
+    z-index: 1;
+    border: 0;
+}
+
+#new-quote:hover {
+    cursor: pointer;
+}
+
+#github-img, #tweet-img{
+    border: 1px solid black;
+    background-color: white;
+    align-items: center;
+    position: absolute;
+    border-radius: 6px;
+    min-height: 40px;
+    margin-top: 2px;  
+    min-width: 40px;
+    right: 50%;
+    height: 40px;
+    top: 555px;
+    width: 40px;
+}
+
+#github-img {
+    right: 47%;
+}
+
+#developer {
+    text-align: center;
+    font-style: italic;
+    position: relative;
+    font-weight: 400;
+    font-size: 25px;
+    bottom: 00px;
+}

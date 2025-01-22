@@ -1,0 +1,25 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8080:80"  # Map port 80 on the container to port 8080 on your local machine
+    volumes:
+      - .:/var/www/html  # Mount your project directory to the container
+    networks:
+      - mynetwork
+
+  db:
+    image: mysql:5.7  # Use MySQL 5.7 image
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge

@@ -1,0 +1,99 @@
+body {
+    background-image: url(https://img.freepik.com/free-photo/3d-illustration-pen-putting-blue-ticks-paper_107791-15675.jpg?t=st=1716884144~exp=1716887744~hmac=46c56347efd104fb1df5d7bd9a3be451fbc4b38f97b20bbe6b656dd35ffe4976&w=1380);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    width: 50%;
+    height: auto;
+    min-width: 200px;
+    max-width: 550px;
+    margin: 5% auto;
+    font-family: cursive, monospace, tahoma;
+    font-size: 2vh;
+}
+
+#main {
+    height: 100%;
+}
+
+div {
+    background-color: rgba(77, 166, 255, 0.8);
+    padding: 0;
+    margin: 0;
+    min-width: 200px;
+    max-width: 500px;
+    flex: 0;
+}
+
+p, h1 {
+    padding: 0px;
+    margin: 0px;
+    text-align: center;
+}
+
+form, .div2, .div1 {
+    width: 100%;
+    min-width: 200px;
+    max-width: 500px;
+}
+
+.inline {
+    display: inline;
+    width: unset;
+    margin: 0 0.5em 0 0;
+    vertical-align: middle;
+}
+
+input, textarea, select {
+    background-color: rgb(0, 77, 153);
+    border: 1px solid #0a0a23;
+    color: #ffffff;
+}
+
+input[type=radio] {
+    accent-color: rgb(0, 77, 153);
+}
+
+input[type="checkbox"] {
+    accent-color: rgb(0, 77, 153);
+}
+
+::placeholder {
+    color: #d9d9d9;
+}
+
+fieldset, #description {
+    border: none;
+    border-bottom: 3px solid rgba(17, 17, 60, 0.5);
+}
+
+#description {
+    padding: 5px;
+}
+
+fieldset:last-of-type {
+    border-bottom: none;
+}
+
+label {
+    display: block;
+    margin: 0.5rem 0;
+}
+
+input, textarea, select {
+    margin: 0.4em 0 0 0;
+    width: 100%;
+    min-height: 1em;
+}
+
+legend {
+    padding-top: 1vh;
+}
+
+#food {
+    margin-top: -0.5vh;
+}
+
+.dontcare {
+    padding-top: 1vh;
+}
