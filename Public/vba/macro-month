@@ -1,0 +1,1354 @@
+
+Sub DownloadFiles()
+    Dim driver As New Selenium.WebDriver
+    Dim checkboxes As Object
+    Dim checkbox As Object
+    Dim totalRows As Long
+    Dim maxRowsLimit As Long
+    Dim fileRows As Long
+    Dim URL As String
+    Dim userName As String
+    Dim Password As String
+    Dim WebDriverPath As String
+    Dim pid As String
+    Dim WB As Workbook
+    Dim csvWB As Workbook
+    
+    ' Edge WebDriver
+    WebDriverPath = Range("G10").Value
+
+    
+    pid = StartEdgeDriver(DriverPath:=WebDriverPath)
+    Set driver = CreateObject("Selenium.WebDriver")
+
+    driver.StartRemotely "http://localhost:17556/", "MicrosoftEdge"
+  
+    ' Visit the website
+    URL = "???"
+    driver.Get URL
+
+    ' Enter username and password in the login form and submit
+   
+    driver.FindElementByClass("submit-button").Click
+    
+ 
+ '=======================================================================================================
+    'Accessing nexlink website and searching for necessary days
+
+
+    ' Open the product management screen
+    driver.Get "???"
+
+    ' Press the Advanced search button
+    Dim detailTags As Object
+    Set detailTags = driver.FindElementsByTag("a")
+
+    For Each Tag In detailTags
+        If Tag.Text = "その他の条件を指定する" Then
+            Tag.Click
+            Exit For
+        End If
+    Next Tag
+
+    driver.FindElementById("search_period_between").Click
+
+    ' Get the date value from cell E5
+    Dim today As String
+    today = Range("C14").Value
+
+    driver.FindElementById("search_from").Click
+
+    ' Get all the <td> elements within the calendar for 'from' date
+    Dim fromDates As Object
+    Set fromDates = driver.FindElementsByCss("a.ui-state-default")
+
+    For Each Tag In fromDates
+         If Tag.Text = today Then
+            Tag.Click
+            Exit For
+        End If
+    Next Tag
+
+    ' Get the date value from cell F5
+    Dim tomorrow As String
+    tomorrow = Range("C14").Value
+
+    driver.FindElementById("search_to").Click
+
+    ' Get all the <td> elements within the calendar for 'to' date
+    Dim toDates As Object
+    Set toDates = driver.FindElementsByCss("a.ui-state-default")
+
+    For Each Tag In toDates
+         If Tag.Text = tomorrow Then
+            Tag.Click
+            Exit For
+        End If
+    Next Tag
+
+    driver.FindElementById("search_button").Click
+    driver.Wait 300
+
+'======================================================================================================
+   'Downloading files and putting inside one folder
+
+
+   Do
+        ' Find all checkboxes
+        Set checkboxes = driver.FindElementsByCss(".download-select-block__button")
+        ' Track the number of checkboxes processed
+        Dim checkboxesProcessed As Integer
+        checkboxesProcessed = 0
+        For Each checkbox In checkboxes
+            ' Click the checkbox to select the file
+            checkbox.Click
+            Application.Wait Now + TimeValue("00:00:01")
+            ' Find and click on the tag with text containing download link
+            Set detailTags = driver.FindElementsByTag("a")
+            For Each Tag In detailTags
+                ' Example condition to find the download link based on tag text
+                If Tag.Text = "全て" Then
+                    ' Open link in new tab using JavaScript
+                    driver.ExecuteScript "window.open('" & Tag.Attribute("href") & "','_blank');"
+                    Exit For ' Exit the loop once found and clicked
+                End If
+            Next Tag
+            ' Increment the count of checkboxes processed
+            checkboxesProcessed = checkboxesProcessed + 1
+            ' Exit the loop if all checkboxes have been processed
+            If checkboxesProcessed = checkboxes.Count Then Exit Do
+        Next checkbox
+        ' Optionally, you can add a wait or other actions here if needed
+    Loop
+
+    ' Wait for 10 minutes (600 seconds) for downloads to complete
+    Application.Wait Now + TimeValue("00:07:50")
+
+    Dim dayFromCell As String
+    ' Get the value from cell C14
+    dayFromCell = ThisWorkbook.Sheets("Press Me").Range("C14").Value
+
+     ' Create a new folder inside the Downloads folder with the current timestamp
+    Dim newFolder As String
+    newFolder = Environ("USERPROFILE") & "\Downloads\" & Format(Now, "yyyy-mm-") & Format(dayFromCell, "00")
+    MkDir newFolder
+
+   ' Move downloaded files to the new folder1
+    Dim fileSystem As Object
+    Set fileSystem = CreateObject("Scripting.FileSystemObject")
+    Dim file As Object
+    For Each file In fileSystem.GetFolder(Environ("USERPROFILE") & "\Downloads").Files
+       ' Move only files downloaded during this session
+        If file.DateCreated > DateAdd("s", -550, Now) Then
+            file.Move newFolder & "\" & file.Name
+        End If
+    Next file
+
+    driver.Quit
+    TerminateEdgeDriver pid
+    Application.Wait Now + TimeValue("00:00:03")
+'
+'======================================================================================================
+    'Searching kitagawa website and download
+   
+   
+   
+   
+    ' Edge WebDriver
+    WebDriverPath = Range("G10").Value
+
+    
+    userName = Range("G11").Value
+    Password = Range("D11").Value
+    
+    pid = StartEdgeDriver(DriverPath:=WebDriverPath)
+    Set driver = CreateObject("Selenium.WebDriver")
+
+    driver.StartRemotely "http://localhost:17556/", "MicrosoftEdge"
+  
+    ' Visit the website
+    URL = "???"
+    driver.Get URL
+
+    ' Enter username and password in the login form and submit
+    driver.FindElementById("email").SendKeys userName
+    driver.FindElementById("password").SendKeys Password
+    driver.FindElementByClass("submit-button").Click
+    
+ 
+ '=======================================================================================================
+    'Accessing Kitagawa nexlink website and searching for necessary days
+
+
+    ' Open the product management screen
+    driver.Get "???"
+
+    ' Press the Advanced search button
+   
+    Set detailTags = driver.FindElementsByTag("a")
+    
+    For Each Tag In detailTags
+        If Tag.Text = "その他の条件を指定する" Then
+            Tag.Click
+            Exit For
+        End If
+    Next Tag
+
+    driver.FindElementById("search_period_between").Click
+    
+    ' Get the date value from cell E5
+   
+    today = Range("C14").Value
+    
+    driver.FindElementById("search_from").Click
+    
+    ' Get all the <td> elements within the calendar for 'from' date
+    
+    Set fromDates = driver.FindElementsByCss("a.ui-state-default")
+    
+    For Each Tag In fromDates
+         If Tag.Text = today Then
+            Tag.Click
+            Exit For
+        End If
+    Next Tag
+        
+    ' Get the date value from cell F5
+    
+    tomorrow = Range("C14").Value
+
+    driver.FindElementById("search_to").Click
+    
+    ' Get all the <td> elements within the calendar for 'to' date
+    
+    Set toDates = driver.FindElementsByCss("a.ui-state-default")
+    
+    For Each Tag In toDates
+         If Tag.Text = tomorrow Then
+            Tag.Click
+            Exit For
+        End If
+    Next Tag
+    
+    driver.FindElementById("search_button").Click
+    driver.Wait 300
+    
+'======================================================================================================
+   'Downloading Kitagawa files and putting inside one folder
+    
+    
+    
+    ' Check for the presence of files (checkboxes)
+    Set checkboxes = driver.FindElementsByCss(".download-select-block__button")
+    
+    If Not checkboxes Is Nothing And checkboxes.Count > 0 Then
+        ' If checkboxes are found, continue with the code
+        Do
+            ' Find all checkboxes
+            Set checkboxes = driver.FindElementsByCss(".download-select-block__button")
+            ' Track the number of checkboxes processed
+            checkboxesProcessed = 0
+            For Each checkbox In checkboxes
+                ' Click the checkbox to select the file
+                checkbox.Click
+                Application.Wait Now + TimeValue("00:00:01")
+                ' Find and click on the tag with text containing download link
+                Set detailTags = driver.FindElementsByTag("a")
+                For Each Tag In detailTags
+                    ' Example condition to find the download link based on tag text
+                    If Tag.Text = "全て" Then
+                        ' Open link in new tab using JavaScript
+                        driver.ExecuteScript "window.open('" & Tag.Attribute("href") & "','_blank');"
+                        Exit For ' Exit the loop once found and clicked
+                    End If
+                Next Tag
+                ' Increment the count of checkboxes processed
+                checkboxesProcessed = checkboxesProcessed + 1
+                ' Exit the loop if all checkboxes have been processed
+                If checkboxesProcessed = checkboxes.Count Then Exit Do
+            Next checkbox
+            ' Optionally, you can add a wait or other actions here if needed
+        Loop
+        
+        ' Wait for 10 seconds (not 10 minutes) for downloads to complete
+        Application.Wait Now + TimeValue("00:02:25")
+        
+        ' Get the value from cell C14
+        dayFromCell = ThisWorkbook.Sheets("Press Me").Range("C14").Value
+        
+        Dim newFolderT As String
+        
+        ' Create a new folder inside the Downloads folder with the current timestamp
+        newFolderT = Environ("USERPROFILE") & "\Downloads\" & Format(Now, "yyyy-mm-") & Format(dayFromCell, "00") & "\tsuikyaku"
+        MkDir newFolderT
+        
+        Dim copiedTsuy As String
+        copiedTsuy = Environ("USERPROFILE") & "\???"
+
+        ' Move downloaded files to the new folder
+        
+        Set fileSystem = CreateObject("Scripting.FileSystemObject")
+        For Each file In fileSystem.GetFolder(Environ("USERPROFILE") & "\Downloads").Files
+            ' Move only files downloaded during this session
+            
+            If file.DateCreated > DateAdd("s", -210, Now) Then
+                file.Move newFolderT & "\" & file.Name
+            End If
+        Next file
+        
+        ' Copy all files from newFolderT to copiedTsuy folder
+        For Each file In fileSystem.GetFolder(newFolderT).Files
+            fileSystem.CopyFile file.Path, copiedTsuy & "\" & file.Name
+        Next file
+            
+        driver.Quit
+        TerminateEdgeDriver pid
+        
+        Application.Wait Now + TimeValue("00:00:03")
+        
+        
+        
+        
+        Dim tsuCombinePath As String
+        Dim CombinedFilePath As String
+        Dim tsuiCombineName As String
+        Dim tsuiFullPath As String
+        Dim tsuiCombineWs As Worksheet
+        Dim lastRow As Long
+        Dim secondFile As Boolean
+        Dim tsu As Object
+    
+        ' Set the folder path where the CSV files are located
+        tsuCombinePath = Environ("USERPROFILE") & "\Downloads\" & Format(Now, "yyyy-mm-") & Format(dayFromCell, "00") & "???"
+        
+        ' Set the combined file path
+        CombinedFilePath = Environ("USERPROFILE") & "\???"
+        
+        ' Initialize the file system object
+        Set fileSystem = CreateObject("Scripting.FileSystemObject")
+        
+        ' Create the output file
+        Set outputFile = fileSystem.CreateTextFile(CombinedFilePath, True)
+        
+        ' Initialize first file flag
+        secondFile = True
+        
+        ' Loop through each CSV file in the folder
+        For Each file In fileSystem.GetFolder(tsuCombinePath).Files
+            If fileSystem.GetExtensionName(file.Path) = "csv" Then
+                Set tsu = fileSystem.OpenTextFile(file.Path, 1)
+                If secondFile Then
+                    outputFile.WriteLine tsu.ReadAll
+                    secondFile = False
+                Else
+                    ' Skip header row for subsequent files
+                    tsu.ReadLine
+                    outputFile.WriteLine tsu.ReadAll
+                End If
+                tsu.Close
+            End If
+        Next file
+        
+        ' Close the output file
+        outputFile.Close
+        
+        
+        
+        
+        
+        
+        
+         
+         Dim nexlinkFolderPathFaxmerged As String
+         
+         
+          ' & Format(Now, "yyyy-mm-") & dayFromCell & "???"
+        ' FileCopy tsuikyakuCSV, copiedTsuy
+         
+         
+    Else
+        ' If no checkboxes are found, quit the Selenium driver and continue
+        driver.Quit
+        TerminateEdgeDriver pid
+        ' Continue with the rest of the code (if any)
+    End If
+   
+   
+   
+   
+   
+   
+   
+    '======================================================================================================
+    'Creating "matome" folder with two documents and closing browser after that
+    
+    
+    ' Create a new folder named "matome" inside the newFolder
+    'Dim matomeFolder As String
+    
+    matomeFolder = newFolder & "\matome"
+    If Dir(matomeFolder, vbDirectory) = "" Then
+        ' If the folder doesn't exist, create it
+        MkDir matomeFolder
+    End If
+    
+    'Environ ("USERPROFILE") & "\Desktop\Nexlink\faxmerged\"
+   
+    
+    ' Combine CSV files into one
+    Dim combinedCSV As String
+    combinedCSV = matomeFolder & "\" & Format(Now, "yyyy-mm-") & dayFromCell & "_???"
+   ' Dim outputFile As Object
+    Set outputFile = fileSystem.CreateTextFile(combinedCSV, True)
+    
+    Dim firstFile As Boolean
+    firstFile = True
+    
+    Dim ts As Object
+    For Each file In fileSystem.GetFolder(newFolder).Files
+        If fileSystem.GetExtensionName(file.Path) = "csv" Then
+            Set ts = fileSystem.OpenTextFile(file.Path, 1)
+            If firstFile Then
+                outputFile.WriteLine ts.ReadAll
+                firstFile = False
+            Else
+                ' Skip header row for subsequent files
+                ts.ReadLine
+                outputFile.WriteLine ts.ReadAll
+            End If
+            ts.Close
+        End If
+    Next file
+   
+   outputFile.Close
+   
+    
+   
+   
+   
+   
+   
+   
+  '======================================================================================================
+    'Creating copy
+    
+   ' Create a copy of the combined CSV file
+    Dim copiedFileName As String
+    Dim copiedFileNameFax As String
+    Dim desktopPath As String
+    Dim nexlinkFolderPath As String
+    
+    Dim copiedFileNamePBI As String
+    Dim copiedFileTsuikyaku As String
+    Dim nexTsuy As String
+    
+    Dim nextTsuyPath As String
+    
+    ' Get the path to the desktop
+    desktopPath = Environ("USERPROFILE") & "\Desktop"
+    
+    ' Set the path to the Nexlink folder on the desktop
+    nexlinkFolderPath = desktopPath & "\Nexlink"
+    nexlinkFolderPathFaxmerged = desktopPath & "\???"
+    
+    nexTsuy = desktopPath & "\Nexlink\faxmerged\tsuikyaku"
+    
+    If Dir(nexTsuy, vbDirectory) = "" Then
+        ' If the folder doesn't exist, create it
+        MkDir nexTsuy
+    End If
+    
+    nextTsuyPath = desktopPath & "\Nexlink\faxmerged\tsuikyaku"
+    
+    ' Check if the Nexlink folder exists
+    If Dir(nexlinkFolderPath, vbDirectory) = "" Then
+        ' If the folder doesn't exist, create it
+        MkDir nexlinkFolderPath
+    End If
+    
+    ' Set the copied file name with the desired name
+    
+    copiedFileName = nexlinkFolderPathFaxmerged & "\" & Format(Now, "yyyy-mm-") & dayFromCell & "_???"
+    
+    copiedFileNameFax = nexlinkFolderPath & "\???"
+    
+    copiedFileNamePBI = nexlinkFolderPath & "\" & Format(Date, "yyyymmdd") & "???"
+    
+    
+
+    
+    
+    ' Copy the combined CSV file to the Nexlink folder
+    FileCopy combinedCSV, copiedFileName
+    
+    FileCopy combinedCSV, copiedFileNameFax
+    
+    FileCopy combinedCSV, copiedFileNamePBI
+    
+    
+    
+
+'======================================================================================================
+    ' Naming Fax Number sheet amd saving .xlsx in Nexlink
+    
+    Dim ws102 As Worksheet
+    Dim pythonScript As String
+    Dim filePath As String
+    Dim wsMain As Worksheet
+    Dim pythonFile As String
+    Dim pythonFile2 As String
+    Dim destinationFile As String
+    Dim destinationFile2 As String
+
+   ' Open the combined CSV file in Excel
+    Set WB = Workbooks.Open(copiedFileNameFax)
+     
+    
+ ' Check if workbook is successfully opened
+    If Not WB Is Nothing Then
+        ' Rename the first sheet to "???"
+        Set wsMain = WB.Sheets(1)
+        wsMain.Name = "Fax Number"
+        
+        ' Save the workbook
+        'WB.Save
+        
+               ' Set default file name
+            fax2Name = "???"
+            
+            ' Specify default folder path
+            saveFolder = "C:\Users\" & Environ("USERNAME") & "\///" ' Set your desired folder path here
+            
+            ' Construct full save path
+            savePath = saveFolder & fax2Name
+            
+            ' Save the workbook as .xlsx format
+            WB.SaveAs savePath, FileFormat:=51
+            WB.Close SaveChanges:=False
+            
+            ' Delete file
+'            copiedFileName = saveFolder & "Fax_Number2.csv"
+'            If Dir(copiedFileName) <> "" Then
+'                Kill copiedFileName
+'            End If
+'
+        
+        
+             
+'        ' Define the source and destination file paths
+'        pythonFile = "C:\Users\" & Environ("USERNAME") & "\???"
+'        pythonFile2 = "C:\Users\" & Environ("USERNAME") & "\???"
+'
+'        destinationFile = "C:\Users\" & Environ("USERNAME") & "\???"
+'        destinationFile2 = "C:\Users\" & Environ("USERNAME") & "\???"
+'
+'        ' Create the destination folder if it does not exist
+'    If Dir("C:\Users\" & Environ("USERNAME") & "\???", vbDirectory) = "" Then
+'        MkDir "C:\Users\" & Environ("USERNAME") & "\????
+'    End If
+'
+'    ' Check if the source file exists and copy it
+'    If Dir(pythonFile) <> "" Then
+'        FileCopy pythonFile, destinationFile
+'    Else
+'        MsgBox "Source python file does not exist: " & pythonFile
+'    End If
+'
+'    ' Check if the source file exists and copy it
+'    If Dir(pythonFile2) <> "" Then
+'        FileCopy pythonFile2, destinationFile2
+'    Else
+'        MsgBox "Source python file does not exist: " & pythonFile2
+'    End If
+'
+    
+    
+    
+
+   
+ '======================================================================================================
+   'Power BI Table
+    copiedFileNamePBI = nexlinkFolderPath & "\" & Format(Date, "yyyymmdd") & "PBI.csv"
+    
+    
+  
+ 
+    Dim xlApp As Object
+    Set xlApp = CreateObject("Excel.Application")
+    xlApp.Visible = True
+ 
+    Dim xlWb As Object
+    Set xlWb = xlApp.Workbooks.Open(copiedFileNamePBI)
+ 
+    ' Rearrange columns C, H, and I to A, B, and C respectively
+    xlWb.Sheets(1).Columns("C:C").Cut
+    xlWb.Sheets(1).Columns("A:A").Insert Shift:=xlToRight
+ 
+    xlWb.Sheets(1).Columns("H:H").Cut
+    xlWb.Sheets(1).Columns("B:B").Insert Shift:=xlToRight
+ 
+    xlWb.Sheets(1).Columns("I:I").Cut
+    xlWb.Sheets(1).Columns("C:C").Insert Shift:=xlToRight
+ 
+    ' Clear all other columns except A, B, and C
+    xlWb.Sheets(1).Columns("D:L").ClearContents
+ 
+'    ' Adjust width of columns
+'    xlWb.Sheets(1).Columns("A").ColumnWidth = 16
+'    xlWb.Sheets(1).Columns("B").ColumnWidth = 16
+'    xlWb.Sheets(1).Columns("C").ColumnWidth = 16
+'
+'   '  Apply center alignment for columns A to M
+'    xlWb.Sheets(1).Range("A:C").HorizontalAlignment = xlCenter
+'    xlWb.Sheets(1).Range("A:C").VerticalAlignment = xlCenter
+'
+'   ' Set text to shrink to fit in column B
+'    xlWb.Sheets(1).Columns("B").ShrinkToFit = True
+'
+'     ' Define the color (hex #83CCEB)
+'    headerColor = RGB(131, 204, 235)
+'
+'    ' Set the background color of row 1 from columns A to G
+'     xlWb.Sheets(1).Range("A1:C1").Interior.Color = headerColor
+    
+    
+'======================================================================================================
+ ' Define the name for the new .xlsx file
+    Dim newFileName As String
+     
+    dayFromCell = ThisWorkbook.Sheets("Press Me").Range("C14").Value
+    newFileName = nexlinkFolderPath & "\" & Format(Date, "yyyy-mm-") & Format(dayFromCell, "00") & "PBI.xlsx"
+    
+    ' Save the workbook as .xlsx
+    xlWb.SaveAs Filename:=newFileName, FileFormat:=51 ' 51 is the FileFormat for .xlsx
+    
+    ' Close the workbook
+    xlWb.Close SaveChanges:=False
+    
+    ' Quit the Excel application
+    xlApp.Quit
+    
+    ' Clean up
+    Set xlWb = Nothing
+    Set xlApp = Nothing
+    
+    ' Define the path for the PBI folder
+    Dim pbiFolderPath As String
+    pbiFolderPath = nexlinkFolderPath & "\PBI\"
+    
+    ' Check if the PBI folder exists, if not, create it
+    If Dir(pbiFolderPath, vbDirectory) = "" Then
+        MkDir pbiFolderPath
+    End If
+    
+    Dim sourceFilePBI As String
+    Dim destinationFilePBI As String
+    Dim fso As Object
+    
+    
+    ' Create a FileSystemObject
+    Set fso = CreateObject("Scripting.FileSystemObject")
+
+    ' Define the source file path and destination file path
+    sourceFile = nexlinkFolderPath & "\" & Format(Date, "yyyy-mm-") & Format(dayFromCell, "00") & "PBI.xlsx" ' Update with the path to the source file
+    destinationFile = nexlinkFolderPath & "\PBI\" & Format(Date, "yyyy-mm-") & Format(dayFromCell, "00") & "PBI.xlsx"
+    
+      ' Check if the source file exists
+    If fso.fileExists(sourceFile) Then
+        ' Move the file
+        fso.MoveFile sourceFile, destinationFile
+        
+    Else
+        MsgBox "Source file does not exist."
+    End If
+    
+    ' Delete the original .csv file
+    Kill copiedFileNamePBI
+   
+   
+   
+   '================================================================================================================================
+
+         'Starting AutoHotkey Script
+
+
+    saveFolder = nexlinkFolderPath ' Set your desired folder path here
+
+   ' Construct full save path
+
+    savePath = saveFolder & "\" & defaultFileName
+
+  ' Dim ahkPath As String
+    Dim ahkScriptPath As String
+
+    ' Path to your AutoHotkey script
+    ahkScriptPath = "C:\Users\ボイコノヴボビルジョン\Documents\AutoHotkey\OpenVSCodeAndRunPython.exe"
+
+    ' Run the AutoHotkey script
+    Shell ahkScriptPath, vbNormalFocus
+    
+    Application.Wait Now + TimeValue("00:04:00")
+
+    
+    
+    
+    
+     '================================================================================================================================
+
+         'Updating list.xlsx Fax_Per_Day.xlsx
+         
+         
+         
+         
+Dim checkFaxPath As String
+    Dim wbThisMonthFax As Workbook
+    Dim wsThisMonthFax As Worksheet
+    Dim oldFilePath2 As String
+    Dim newFilePath2 As String
+    Dim wbFaxDay As Workbook
+    Dim wsFaxDay As Worksheet
+    Dim wbListDay As Workbook
+    Dim wsListDay As Worksheet
+    
+    Dim nextEmptyRow As Long
+    Dim dateStringDay As String
+    Dim formattedDateDay As String
+    
+    Dim sourceFile3 As String
+    Dim checkFilePath3 As String
+    sourceFile3 = Environ("USERPROFILE") & "\Desktop\Nexlink\category_fax_counts_tsuikyaku.csv"
+    
+    
+    ' Define the color (hex #83CCEB)
+    headerColor = RGB(131, 204, 235)
+   
+     ' Path to the folder where the file is located
+    folderPath = Environ("USERPROFILE") & "\Desktop\Nexlink\"
+    checkFaxPath = Environ("USERPROFILE") & "\Desktop\Nexlink\Fax_Per_Day.xlsx"
+    ' Path to the old file that needs to be renamed
+    oldFilePath2 = folderPath & "list.xlsx"
+    ' Path to the new file name
+    newFilePath2 = folderPath & "Fax_Per_Day.xlsx"
+    
+     checkFilePath3 = newFilePath2
+    ' Check if the file exists
+If Dir(checkFaxPath) <> "" Then
+    'On Error GoTo ErrorHandler
+
+    ' Open the renamed file and list file
+    Set wbFaxDay = Workbooks.Open(newFilePath2)
+    Set wsFaxDay = wbFaxDay.Sheets(1) ' Adjust if necessary
+    Set wbListDay = Workbooks.Open(oldFilePath2)
+    Set wsListDay = wbListDay.Sheets(1) ' Adjust if necessary
+
+    ' Create an array to store values from non-contiguous cells A2, B2, C2
+    Dim dataToPaste(1 To 1, 1 To 3) As Variant
+    dataToPaste(1, 1) = wsListDay.Range("A2").Value
+    dataToPaste(1, 2) = wsListDay.Range("B2").Value
+    dataToPaste(1, 3) = wsListDay.Range("C2").Value
+
+    ' Find the next empty row in Fax_Per_Day.xlsx after row 2
+    nextEmptyRow = wsFaxDay.Cells(wsFaxDay.Rows.Count, "I").End(xlUp).Row + 1
+    If nextEmptyRow < 2 Then nextEmptyRow = 2
+
+    ' Paste the data into the next empty row in columns I-K
+    wsFaxDay.Range("I" & nextEmptyRow & ":K" & nextEmptyRow).Value = dataToPaste
+    checkFilePath3 = newFilePath2
+     ' Check if the sourceFile3 source file exists
+  ' Check if the sourceFile3 exists
+    If Dir(sourceFile3) <> "" Then
+        faxNumberTsui = Environ("USERPROFILE") & "\Desktop\Nexlink\Fax_Per_Day.xlsx"
+
+        ' Open the Fax_Per_Day.xlsx file to find the next empty row in column L
+        Workbooks.Open Filename:=faxNumberTsui
+        Set wbFaxDay = ActiveWorkbook
+        Set wsFaxDay = wbFaxDay.Sheets(1)
+        nextEmptyRow = wsFaxDay.Cells(wsFaxDay.Rows.Count, "L").End(xlUp).Row + 1
+        If nextEmptyRow < 2 Then nextEmptyRow = 2
+        
+        
+        ' Sum all values in column L from L2 to the last filled cell
+        sumValues = Application.WorksheetFunction.Sum(wsFaxDay.Range("L2:L" & nextEmptyRow - 1))
+        
+
+         ' Open the sourceFile3 and copy data from B2
+        Workbooks.Open Filename:=sourceFile3
+        Set sourceWorkbook = ActiveWorkbook
+        Set wsSource = sourceWorkbook.Sheets(1)
+        copiedData = wsSource.Range("B2").Value
+
+        ' Calculate the new value for the next empty cell in column L
+        newValue = copiedData - sumValues
+        
+        ' Paste the calculated value into the next empty cell in column L
+        wsFaxDay.Cells(nextEmptyRow, "L").Value = newValue
+
+        ' Close the source file
+        sourceWorkbook.Close SaveChanges:=False
+        
+        
+        
+        Else
+        
+        ' File does not exist, open the Fax_Per_Day.xlsx file and add 0 to the next empty cell in column L
+        faxNumberTsui = Environ("USERPROFILE") & "\Desktop\Nexlink\Fax_Per_Day.xlsx"
+        Workbooks.Open Filename:=faxNumberTsui
+        Set wbFaxDay = ActiveWorkbook
+        Set wsFaxDay = wbFaxDay.Sheets(1)
+        nextEmptyRow = wsFaxDay.Cells(wsFaxDay.Rows.Count, "L").End(xlUp).Row + 1
+        If nextEmptyRow < 2 Then nextEmptyRow = 2
+    
+        ' Add 0 to the next empty cell in column L
+        wsFaxDay.Cells(nextEmptyRow, "L").Value = 0
+        
+    End If
+
+    ' Save and close the workbooks
+   ' destWorkbook.Save
+    'destWorkbook.Close
+    wbFaxDay.Save
+    wbListDay.Close False
+    wbFaxDay.Close False
+        
+         Dim deletelist As String
+            deletelist = Environ("USERPROFILE") & "\Desktop\Nexlink\list.xlsx"
+             ' Delete the file Main_Data.csv
+    
+            If Dir(deletelist) <> "" Then
+                Kill deletelist
+                
+            Else
+                MsgBox "File list.xlsx does not exist.", vbExclamation
+            End If
+         
+ Else
+ 
+ 
+ 
+     ' Rename the file if it doesn't exists
+    Name oldFilePath2 As newFilePath2
+ 
+     ' Open the renamed file
+        Set wbFaxDay = Workbooks.Open(newFilePath2)
+        Set wsFaxDay = wbFaxDay.Sheets(1) ' Adjust if necessary
+ 
+         ' Move cells A1:C2 to I1:K2
+        wsFaxDay.Range("A1:C2").Cut Destination:=wsFaxDay.Range("I1")
+ 
+         ' Set column I-K width to 18
+        wsFaxDay.Columns("I:L").ColumnWidth = 18
+        wsFaxDay.Columns("D:E").ColumnWidth = 11
+        
+        ' Set the height of row 1 and 2 to 20
+        wsFaxDay.Rows("1:33").RowHeight = 20
+         ' Center text inside columns I and J
+        wsFaxDay.Range("I:I, J:J").HorizontalAlignment = xlCenter
+        
+        ' Set the color of I1-K1 to headerColor
+        wsFaxDay.Range("I1:L1").Interior.Color = headerColor
+        wsFaxDay.Range("D1:E1").Interior.Color = headerColor
+        wsFaxDay.Range("C2").Interior.Color = headerColor
+        
+        ' Set cell L1 to ??
+        wsFaxDay.Range("L1").Value = "追客"
+        
+        ' Set cell I33 to ??
+        wsFaxDay.Range("C2").Value = "Total"
+        wsFaxDay.Range("D1").Value = "業種別"
+        wsFaxDay.Range("E1").Value = "追客"
+        
+        
+        ' Set cell K33 to the sum of cells J2:J32
+        wsFaxDay.Range("D2").Formula = "=SUM(K2:K32)"
+        
+        ' Set cell L33 to the sum of cells L2:L32
+        wsFaxDay.Range("E2").Formula = "=SUM(L2:L32)"
+        
+        ' Center text inside columns I-K both horizontally and vertically
+        With wsFaxDay.Range("I:L")
+            .HorizontalAlignment = xlCenter
+            .VerticalAlignment = xlCenter
+        End With
+        
+         ' Apply borders to all cells in columns A to G
+            With wsFaxDay.Range("I1:L32").Borders
+                .LineStyle = xlContinuous
+                .ColorIndex = xlAutomatic
+                .TintAndShade = 0
+                .Weight = xlThin
+            End With
+            
+            ' Apply borders to all cells in columns A to G
+            With wsFaxDay.Range("C1:E2").Borders
+                .LineStyle = xlContinuous
+                .ColorIndex = xlAutomatic
+                .TintAndShade = 0
+                .Weight = xlThin
+            End With
+        
+      
+       
+         ' Check if the second source file exists
+        If Dir(sourceFile3) <> "" Then
+        
+        
+        faxNumberTsui = userProfile & "\Desktop\Nexlink\Fax_Per_Fax.xlsx"
+        
+        ' Open the first source file and copy data
+        Workbooks.Open Filename:=sourceFile3
+        Set sourceWorkbook = ActiveWorkbook
+        Set wsSource = sourceWorkbook.Sheets(1)
+        wsSource.Range("B2").Copy
+        
+        ' Open the destination file and paste data
+        Workbooks.Open Filename:=checkFilePath3
+        Set destWorkbook = ActiveWorkbook
+        Set wsDest = destWorkbook.Sheets(1)
+        wsDest.Range("L2").PasteSpecial Paste:=xlPasteValues
+        
+        ' Paste data into the destination file
+        wsDest.Range("L2").PasteSpecial Paste:=xlPasteValues
+        
+        ' Close the second source file
+        sourceWorkbook.Close SaveChanges:=False
+            
+           
+        End If
+        
+        
+        ' Save and close the workbook
+        wbFaxDay.Save
+        wbFaxDay.Close False
+         
+ End If
+         
+    
+ 
+   '================================================================================================================================
+         'Merging today102 with whole 102
+         
+         
+
+    Dim wbToday As Workbook
+    Dim wbWhole As Workbook
+    Dim wsToday As Worksheet
+    Dim wsWhole As Worksheet
+    Dim todayRange As Range
+    Dim wholeRange As Range
+    Dim todayCell As Range
+    Dim wholeCell As Range
+    Dim todayRow As Range
+    Dim wholeRow As Range
+    Dim todayRowIndex As Long
+    Dim wholeRowIndex As Long
+    Dim lastRowToday As Long
+    Dim lastRowWhole As Long
+    Dim todayFilePath As String
+    Dim deleteMain As String
+    
+'    ' Open the workbooks
+'    Set wbToday = Workbooks.Open(Environ("USERPROFILE") & "\Desktop\Nexlink\today102.xlsx")
+'    Set wbWhole = Workbooks.Open(Environ("USERPROFILE") & "\Desktop\Nexlink\whole102.xlsx")
+'    todayFilePath = Environ("USERPROFILE") & "\Desktop\Nexlink\today102.xlsx"
+'    deleteMain = Environ("USERPROFILE") & "\Desktop\Nexlink\Main_Data.csv"
+'
+'     ' Set the worksheets
+'    Set wsToday = wbToday.Sheets(1) ' Adjust if necessary
+'    Set wsWhole = wbWhole.Sheets(1) ' Adjust if necessary
+'
+'    ' Find the last rows in both worksheets
+'    lastRowToday = wsToday.Cells(wsToday.Rows.Count, "B").End(xlUp).Row
+'    lastRowWhole = wsWhole.Cells(wsWhole.Rows.Count, "B").End(xlUp).Row
+'
+'    ' Set the ranges to compare
+'    Set todayRange = wsToday.Range("B1:G" & lastRowToday)
+'    Set wholeRange = wsWhole.Range("B1:G" & lastRowWhole)
+'
+'    ' Loop through each row in the today sheet
+'    For Each todayRow In todayRange.Rows
+'        todayRowIndex = todayRow.Row
+'
+'        ' Loop through each row in the whole sheet to find a match
+'        For Each wholeRow In wholeRange.Rows
+'            wholeRowIndex = wholeRow.Row
+'
+'            ' Check for matches in column B and F
+'            If wsToday.Cells(todayRowIndex, "B").value = wsWhole.Cells(wholeRowIndex, "B").value And _
+'               wsToday.Cells(todayRowIndex, "F").value = wsWhole.Cells(wholeRowIndex, "F").value Then
+'
+'                ' Copy the entire row from today sheet (columns A to G)
+'                wsToday.Range(wsToday.Cells(todayRowIndex, "A"), wsToday.Cells(todayRowIndex, "G")).Copy
+'                ' Replace the matching row in whole sheet
+'                wsWhole.Range(wsWhole.Cells(wholeRowIndex, "A"), wsWhole.Cells(wholeRowIndex, "G")).PasteSpecial Paste:=xlPasteAll
+'                Exit For
+'            End If
+'        Next wholeRow
+'
+'        ' Optional: Clear the clipboard
+'        Application.CutCopyMode = False
+'    Next todayRow
+'
+'    ' Save and close the workbooks
+'    wbWhole.Save
+'    wbToday.Close False
+'    wbWhole.Close False
+'
+'    ' Delete the file today102.xlsx
+'        If Dir(todayFilePath) <> "" Then
+'            Kill todayFilePath
+'
+'        Else
+'            MsgBox "File today102.xlsx does not exist.", vbExclamation
+'        End If
+'
+'    ' Delete the file Main_Data.csv
+'
+'        If Dir(deleteMain) <> "" Then
+'            Kill deleteMain
+'
+'        Else
+'            MsgBox "File Main_Data.csv does not exist.", vbExclamation
+'        End If
+'
+'==================================================================================================================================
+    'Merging list.csv with BaseList.csv or creating it
+    
+        Dim listFilePath As String
+        Dim baseListFilePath As String
+        Dim wsList As Worksheet
+        Dim wsBaseList As Worksheet
+        Dim lastRowBase As Long
+        Dim cell As Range
+    
+'        ' Define the file paths
+'        listFilePath = Environ("USERPROFILE") & "\Desktop\Nexlink\todaylist.csv"
+'        baseListFilePath = Environ("USERPROFILE") & "\Desktop\Nexlink\BaseList.csv"
+'
+'        ' Create FileSystemObject
+'        Set fso = CreateObject("Scripting.FileSystemObject")
+'
+'        ' Check if BaseList.csv exists
+'        If Not fso.fileExists(baseListFilePath) Then
+'            ' Rename list.csv to BaseList.csv
+'            Name listFilePath As baseListFilePath
+'
+'            ' Open BaseList.csv (formerly list.csv)
+'            Workbooks.Open baseListFilePath
+'            Set wsBaseList = ActiveSheet
+'
+'            ' Move column G to column A
+'            wsBaseList.Columns("G:G").Cut wsBaseList.Columns("A:A")
+'
+'            ' Delete columns B to F
+'            wsBaseList.Columns("B:F").Delete
+'
+'            ' Save and close the workbook
+'            ActiveWorkbook.Save
+'            ActiveWorkbook.Close
+'        Else
+'            ' Open both CSV files
+'            Workbooks.Open listFilePath
+'            Set wsList = ActiveSheet
+'            Workbooks.Open baseListFilePath
+'            Set wsBaseList = ActiveSheet
+'
+'            ' Get the last rows
+'            lastRow = wsList.Cells(wsList.Rows.Count, "G").End(xlUp).Row
+'            lastRowBase = wsBaseList.Cells(wsBaseList.Rows.Count, "A").End(xlUp).Row
+'
+'            ' Copy data from column G in list.csv to column A in BaseList.csv
+'            For Each cell In wsList.Range("G2:G" & lastRow)
+'                wsBaseList.Cells(lastRowBase + 1, 1).value = cell.value
+'                lastRowBase = lastRowBase + 1
+'            Next cell
+'
+'            ' Save and close both workbooks
+'            wsList.Parent.Save
+'            wsList.Parent.Close
+'            wsBaseList.Parent.Save
+'            wsBaseList.Parent.Close
+'        End If
+    
+    
+    
+   
+'==================================================================================================================================
+    'Check if This_Month_Fax.xlsx file exist
+    
+    Dim checkFilePath As String
+    Dim finalFax As Worksheet
+    Dim finalFax2 As Worksheet
+    
+    Dim i As Long
+    Dim valueWhole As Double
+    Dim valueThisMonthFax As Double
+    
+    
+    ' Get the user profile path
+    userProfile = Environ("USERPROFILE")
+
+    ' Path to check if the file exists
+    checkFilePath = Environ("USERPROFILE") & "\Desktop\Nexlink\This_Month_Fax.xlsx"
+    
+    ' Set the file paths
+    Dim sourceFile1 As String
+    sourceFile1 = userProfile & "\Desktop\Nexlink\category_fax_counts.csv"
+    
+    sourceFile2 = userProfile & "\Desktop\Nexlink\category_fax_counts_tsuikyaku.csv"
+    
+    
+    ' Open the first source file and copy data
+    Workbooks.Open Filename:=sourceFile1
+    Set sourceWorkbook = ActiveWorkbook
+    Set wsSource = sourceWorkbook.Sheets(1)
+    wsSource.Range("A1:B12").Copy
+    
+    ' Open the destination file and paste data
+    Workbooks.Open Filename:=checkFilePath
+    Set destWorkbook = ActiveWorkbook
+    Set wsDest = destWorkbook.Sheets(1)
+    wsDest.Range("I1:J12").PasteSpecial Paste:=xlPasteValues
+    
+    ' Close the first source file
+    sourceWorkbook.Close SaveChanges:=False
+    
+    ' Open the second source file and copy data
+    If Dir(sourceFile2) <> "" Then
+    ' File exists, open it
+        Workbooks.Open Filename:=sourceFile2
+        Set sourceWorkbook = ActiveWorkbook
+        Set wsSource = sourceWorkbook.Sheets(1)
+        wsSource.Range("A2:B2").Copy
+        
+        
+        
+        ' Open the destination file and paste data
+        Workbooks.Open Filename:=checkFilePath
+        Set destWorkbook = ActiveWorkbook
+        Set wsDest = destWorkbook.Sheets(1)
+        ' Paste data into the destination file
+        wsDest.Range("I13:J13").PasteSpecial Paste:=xlPasteValues
+    ' Close the second source file
+        sourceWorkbook.Close SaveChanges:=False
+    End If
+    
+    
+    
+    
+    
+    
+    
+    
+    ' Define the color (hex #83CCEB)
+    headerColor = RGB(131, 204, 235)
+    
+     ' Path to the folder where the file is located
+    folderPath = "C:\Users\ボイコノヴボビルジョン\Desktop\Nexlink\"
+    ' Path to the old file that needs to be renamed
+    'oldFilePath = folderPath & "whole102.xlsx"
+    ' Path to the new file name
+    newFilePath = folderPath & "This_Month_Fax.xlsx"
+    
+     
+    ' Check if the file exists This_Month_Fax.xlsx
+If Dir(checkFilePath) <> "" Then
+        ' File exists, so finish the VBA code
+        
+         Shell "explorer.exe " & folderPath, vbNormalFocus
+            
+            
+            Set WB = Workbooks.Open(newFilePath)
+            
+            Set finalFax = WB.Sheets(1)
+            
+            ' Set column widths for columns A to G
+            finalFax.Columns("A").ColumnWidth = 15
+            finalFax.Columns("B").ColumnWidth = 15
+            finalFax.Columns("C").ColumnWidth = 15
+            finalFax.Columns("D").ColumnWidth = 15
+            finalFax.Columns("E").ColumnWidth = 15
+            finalFax.Columns("F").ColumnWidth = 15
+            finalFax.Columns("G").ColumnWidth = 15
+            finalFax.Columns("I").ColumnWidth = 27
+            finalFax.Columns("J").ColumnWidth = 17
+            
+            ' Center alignment for specific columns (A, B, D, F)
+            finalFax.Columns("A").HorizontalAlignment = xlCenter
+            finalFax.Columns("B").HorizontalAlignment = xlCenter
+            finalFax.Columns("D").HorizontalAlignment = xlCenter
+            finalFax.Columns("F").HorizontalAlignment = xlCenter
+            finalFax.Columns("I").HorizontalAlignment = xlCenter
+            
+            ' Set the background color of row 1 from columns A to G
+            finalFax.Range("A1:G1").Interior.Color = headerColor
+            finalFax.Range("I1:J1").Interior.Color = headerColor
+            
+            ' Apply borders to all cells in columns A to G
+            With finalFax.Range("A:G").Borders
+                .LineStyle = xlContinuous
+                .ColorIndex = xlAutomatic
+                .TintAndShade = 0
+                .Weight = xlThin
+            End With
+            
+             ' Apply borders to all cells in columns A to G
+            With finalFax.Range("I1:J13").Borders
+                .LineStyle = xlContinuous
+                .ColorIndex = xlAutomatic
+                .TintAndShade = 0
+                .Weight = xlThin
+            End With
+            
+            finalFax.Name = "This_Month_Fax"
+           
+            ' Save the workbook as .xlsx format
+            WB.Save
+            WB.Close SaveChanges:=False
+            
+            ' Delete the first source file
+            Kill sourceFile1
+            ' Delete the second source file
+            If Dir(sourceFile2) <> "" Then
+            ' File exists, delete it
+            Kill sourceFile2
+             End If
+             
+            MsgBox "Work is done", vbExclamation
+            
+            
+        
+   
+        
+Else
+    
+            
+         MsgBox "File This_Month_Fax.xlsx does not exist.", vbExclamation
+        
+           
+    End If
+    End If
+    
+    
+End Sub
+                    
+                    
+ Sub CloseAutoHotkeyScript()
+    Dim ahkScriptName As String
+    ahkScriptName = "OpenVSCodeAndRunPython.exe"
+    
+    ' Command to close the AutoHotkey application
+    Dim closeCommand As String
+    closeCommand = "taskkill /IM " & ahkScriptName & " /F"
+    
+    ' Execute the command
+    Shell "cmd.exe /c " & closeCommand, vbHide
+End Sub
+                             
+                            
+ '======================================================================================================
+ '   'Styling "Main Data" sheet
+ '
+ '   ' Activate the "Main Data" sheet
+ '   Dim wsFirstSheet As Worksheet
+ '   Set wsFirstSheet = wb.Sheets(1)
+ '   wsFirstSheet.Activate
+ '
+ '  ' Adjust width of columns
+ '   wsFirstSheet.Columns("B").ColumnWidth = 26
+ '   wsFirstSheet.Columns("C").ColumnWidth = 12
+ '   wsFirstSheet.Columns("D").ColumnWidth = 28
+ '   wsFirstSheet.Columns("E").ColumnWidth = 29
+ '   wsFirstSheet.Columns("F").ColumnWidth = 29
+ '   wsFirstSheet.Columns("G").ColumnWidth = 13
+ '   wsFirstSheet.Columns("H").ColumnWidth = 12
+ '   wsFirstSheet.Columns("I").ColumnWidth = 17
+ '
+ '  ' Apply center alignment for columns A to M
+ '   wsFirstSheet.Range("A:M").HorizontalAlignment = xlCenter
+ '   wsFirstSheet.Range("A:M").VerticalAlignment = xlCenter
+ '
+ '   ' Set text to shrink to fit in column B
+ '   wsFirstSheet.Columns("H").ShrinkToFit = True
+    
+    
+    
+ '======================================================================================================
+    
+'送達
+'送達日
+'ステータス
+'FAXのカウント
+
+
+Private Sub SetDate(driver As Object, targetDate As String, idPrefix As String)
+    ' Get all <td> elements within the calendar for 'from' date
+    Dim dates As Object
+    Set dates = driver.FindElementsByTag("a")
+    
+    For Each Tag In dates
+        If Tag.Text = targetDate Then
+            Tag.Click
+            Exit For
+        End If
+    Next Tag
+End Sub
+
+Private Function StartEdgeDriver( _
+    ByVal DriverPath As String, _
+    Optional ByVal PortNo As Long = 17556) As Long
+   
+    Dim DriverFolderPath As String
+    Dim DriverName As String
+    Dim Options As String
+    Dim itm As Object, itms As Object
+    Dim pid As Long: pid = 0
+   
+    With CreateObject("Scripting.FileSystemObject")
+        If .fileExists(DriverPath) = False Then GoTo Fin
+        DriverFolderPath = .GetParentFolderName(DriverPath)
+        DriverName = .GetFileName(DriverPath)
+    End With
+    
+    ' Check for multiple instances
+    Set itms = CreateObject("WbemScripting.SWbemLocator").ConnectServer.ExecQuery _
+              ("Select * From Win32_Process Where Name = '" & DriverName & "'")
+    If itms.Count > 0 Then
+        For Each itm In itms
+            pid = itm.ProcessId: GoTo Fin
+        Next
+    End If
+   
+    ' Start WebDriver
+    Options = " --host=localhost --jwp --port=" & PortNo
+    With CreateObject("WbemScripting.SWbemLocator").ConnectServer.Get("Win32_Process")
+        .Create DriverPath & Options, DriverFolderPath, Null, pid
+    End With
+   
+Fin:
+    StartEdgeDriver = pid
+End Function
+
+Private Sub TerminateEdgeDriver(ByVal ProcessId As Long)
+    Dim itm As Object, itms As Object
+    
+    Set itms = CreateObject("WbemScripting.SWbemLocator").ConnectServer.ExecQuery _
+              ("Select * From Win32_Process Where ProcessId = " & ProcessId & "")
+    If itms.Count > 0 Then
+        For Each itm In itms
+            itm.Terminate: Exit For
+        Next
+    End If
+End Sub
+
+Private Function clickButton(ByVal tagName As String, ByVal targetText As String)
+    Set targetTags = driver.FindElementsByTagName(tagName)
+    For Each Tag In targetTags
+        If Tag.Text = targetText Then
+            Tag.Click
+            Exit For
+        End If
+    Next Tag
+End Function
+
+
+

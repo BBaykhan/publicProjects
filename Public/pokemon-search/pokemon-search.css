@@ -1,0 +1,151 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+    * {
+      scroll-behavior: smooth;
+    }
+  }
+body {
+background-image: url("https://img.freepik.com/free-vector/background-with-gradient-starry-night_23-2148276919.jpg?t=st=1726552395~exp=1726555995~hmac=c341aaeeb947f7ec8e6569151a6800545f5e6e0ec4ad307745f8c4420d20d7dc&w=1380");
+background-repeat: no-repeat;
+background-position: center; 
+background-size: cover; 
+}
+#search-input {
+  box-shadow: inset 0;
+  border-radius: 5px;
+  text-align: center;
+  transition: 0.5s;
+  position: fixed;
+  font-size: 40px;
+  width: 900px;
+  height: 70px;
+  left: 300px;
+  top: 100px;
+  border: 0;
+}
+#search-input:focus {
+  transition-timing-function: linear;
+  box-shadow: 0 0 5pt 2pt #D3D3D3;
+  transition: all 0.5s ease-out;
+  outline-width: 0px;
+}
+#search-input:hover {
+  transition-timing-function: linear;
+  box-shadow: 0 0 5pt 2pt #D3D3D3;
+  transition: all 0.5s ease-out;
+}
+#search-button {
+  font-family: ariel;
+  border-radius: 5px;
+  color: #1c4ae9;
+  transition: 0.5s;
+  position: fixed;
+  font-size: 30px;
+  width: 200px;
+  height: 50px;
+  left: 640px;
+  top: 200px;
+  border: 0;
+}
+#search-button:hover {
+  transition-timing-function: linear;
+  box-shadow: 0 0 5pt 2pt #D3D3D3;
+  transition: all 0.5s ease-out;
+  font-size: 33px;
+  color: #1c4a96;
+  border: 0;
+}
+#search-input::placeholder {
+  color: #cecece;
+}
+#card-div {
+  background-color: #6cd5ff;
+  border-radius: 10px;
+  padding: 12px 13px;
+  position: fixed;
+  height: 440px;
+  width: 340px;
+  left: 575px;
+  top: 350px;
+}
+#inner-card-div {
+  background-color: #ebffff;
+  border-radius: 5px;
+  transition: 0.5s;
+  height: 416px;
+  padding: 10px;
+  width:314px;
+  border: 0;
+}
+#inner-card-div:hover {
+  transition-timing-function: linear;
+  box-shadow: 0 0 8pt 8pt #b2e9ff;
+  transition: all 0.5s ease-out;
+  border: 0;
+}
+#left-text-div {
+  /* border: 1px solid red; */
+  display: inline-block;
+  padding-top: 6px;
+  width: 129px;
+  height: 400px;
+}
+#right-text-div {
+  /* border: 1px solid red; */
+  display: inline-block;
+  text-align: right;
+  padding-top: 6px;
+  position: fixed;
+  margin-left: 0;
+  width: 165px;
+  height: 400px;
+}
+.card-left-text {
+  margin: 0 5px 15px;
+  font-size: 18px;
+}
+.card-right-text {
+  margin: 0 0 15px 5px;
+  font-size: 18px;
+}
+#freepik {
+  position: absolute;
+  bottom: 10px;
+  left: 44%;
+}
+#types p {
+  display: inline;
+  margin-right: 5px; 
+}
+#pokemon-name p {
+  display: inline;
+}
+#types p:last-child {
+  margin-right: 0; 
+}
+#sprite-background {
+  background-color: #ebffff;
+  position: absolute;
+  border-radius: 5px;
+  display: none;
+  height: 70px;
+  left: 705px;
+  width: 70px;
+  top: 266px;
+}
+#sprite {
+  /* border: 1px solid red; */
+  position: absolute;
+  top: 269px;
+  left: 708px;
+  max-height: 65px;
+  max-width: 65px;
+  height: 65px;
+  width: 65px;
+}

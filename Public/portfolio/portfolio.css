@@ -1,0 +1,370 @@
+:root {
+    --apple1: #e60000;
+    --apple-hover: #800000;
+    --apple-text: #ffe6e6;
+  }
+  * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box !important;
+  }
+  
+  @media (prefers-reduced-motion: no-preference) {
+      * {
+          scroll-behavior: smooth;
+      }
+  }
+  
+  body {
+      width: 100%;
+      background-color: #e8e9eb;
+      font: italic 1.5rem "Fira Sans", serif;
+      font-weight: bold;
+      color: #002D62;
+  }
+  
+  #hide-back {
+      height: 6vh;
+      width: 100%;
+      position: absolute;
+      top: 0;
+      background-color: #081521;
+  }
+  
+  #navigation1 {
+      content: "";
+      width: 100%;
+      height: 1px;
+      position: absolute;
+      top: 0;
+      visibility: hidden;
+  }
+  
+  #navbar {
+      display: block !important;
+      position: fixed !important;
+      top: 0 !important;
+      height: 6vh !important;
+      width: 100% !important;
+      background-color: #081521;
+      overflow: hidden !important;
+      z-index: 1000 !important;
+      opacity: 95%;
+  }
+  
+  .navbar-li {
+      display: inline-block;
+      height: 6vh;
+      width: 33.33%;
+      text-align: center;
+      list-style-type: none;
+  }
+  .hidden-li {
+      display: none;
+  }
+  
+  #navbar-ul {
+      display: flex;
+      padding: 0;
+      margin: 0;
+  }
+  
+  .navbar-li a {
+      display: block;
+      width: 100%;
+      height: 100%;
+      text-decoration: none;
+      padding-top: 1.4vh;
+      transition: 0.4s;
+      color: white;
+      font-family: "Roboto Condensed", sans-serif;
+      text-transform: uppercase;
+      font-weight: 500;
+  }
+  
+  .navbar-li a:hover {
+      background-color: #0f4c81;
+      font-size: 1.6rem;
+      transition: 0.4s;
+  }
+  
+  #background {
+    height: 100vh;
+    width: 100%;
+    margin-top: 6vh;
+    background-image: url(https://wallpaperswide.com/download/helix_nebula_eye_of_god-wallpaper-3554x1999.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    z-index: 9;
+  }
+  
+  #upper-blur, #apple-info {
+      width: 100%;
+      text-align: center;
+      backdrop-filter: blur(8px);
+      position: absolute;
+      z-index: 9;
+  }
+  
+  #upper-blur {
+      height: 30%;
+      top: 18vh;
+      mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 100%, transparent 100%);
+  }
+  
+  #apple-info {
+      height: 40%;
+      top: 45vh;
+      mask-image: linear-gradient(to bottom, transparent 0%, black 5%, black 90%, transparent 100%);
+  }
+  
+  #welcome-section {
+      width: 100%;
+      height: 50vh;
+      position: absolute;
+      top: 20vh;
+      z-index: 10;
+      display: flex;
+      align-items: top;
+      justify-content: center;
+  }
+  
+  #welcome-section h1 {
+      vertical-align: middle;
+      font-size: 87px;
+      color: white;
+      font-family: "Roboto Condensed", sans-serif;
+      line-height: 88%;
+      text-transform: uppercase;
+      font-weight: 500;
+      font-style: normal;
+      translate: none;
+      rotate: none;
+      scale: none;
+      opacity: 1;
+      transform: translate(0px, 0px);
+  }
+  
+  #my-apple-div {
+      position: relative;
+      width: 100%;
+      height: 50vh;
+      top: 25vh;
+      z-index: 10;
+  }
+  
+  #apple-body {
+      width: 35%;
+      height: 100%;
+      margin: 0 auto;
+      display: flex;
+  }
+  
+  #apple-body-part1 {
+      fill: var(--apple1); 
+      transition: fill 0.5s ease;
+  }
+  
+  #apple-text1 {
+      font-size: 30px; 
+      fill: var(--apple-text); 
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+  }
+  
+  #leaf-text {
+      font-size: 22px; 
+      fill: var(--apple-text);
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+  }
+  
+  #leaf-group:hover #apple-leaf {
+      fill: #006d00; 
+  }
+  
+  #leaf-group:hover #leaf-text {
+      visibility: visible;
+      opacity: 1;
+  }
+  
+  #apple-part1:hover #apple-body-part1 {
+      fill: var(--apple-hover); 
+  }
+  
+  #apple-part1:hover #apple-text1 {
+      fill: var(--apple-text); 
+      visibility: visible;
+      opacity: 1;
+      z-index: 20;
+  }
+  
+  #apple-part1 {
+      position: relative;
+      z-index: 16;
+  }
+  
+  #apple-part2 {
+      position: relative;
+      z-index: 15;
+  }
+  #apple-part2:hover #apple-text2 {
+      fill: var(--apple-text); 
+      visibility: visible;
+      opacity: 1;
+      z-index: 20;
+  }
+  #apple-part2:hover #apple-body-part2 {
+      fill: var(--apple-hover); 
+  }
+  #apple-body-part2 {
+      fill: var(--apple1); 
+      transition: fill 0.5s ease;
+  }
+  
+  #apple-text2 {
+      font-size: 30px; 
+      fill: var(--apple-text);
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+  }
+  
+  #apple-part3 {
+      position: relative;
+      z-index: 16;
+  }
+  #apple-part3:hover #apple-body-part3 {
+      fill: var(--apple-hover); 
+  }
+  
+  #apple-part3:hover #apple-text3 {
+      fill: var(--apple-text); 
+      visibility: visible;
+      opacity: 1;
+      z-index: 20;
+  }
+  
+  #apple-body-part3 {
+      fill: var(--apple1); 
+      transition: fill 0.5s ease;
+  }
+  
+  #apple-text3 {
+      font-size: 30px; 
+      fill: var(--apple-text); 
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+  }
+  
+  #apple-part4 {
+      position: relative;
+      z-index: 15;
+  }
+  #apple-part4:hover #apple-text4 {
+      fill: var(--apple-text); 
+      visibility: visible;
+      opacity: 1;
+      z-index: 20;
+  }
+  #apple-part4:hover #apple-body-part4 {
+      fill: var(--apple-hover); 
+  }
+  #apple-body-part4 {
+      fill: var(--apple1); 
+      transition: fill 0.5s ease;
+  }
+  
+  #apple-text4 {
+      font-size: 30px; 
+      fill: var(--apple-text); 
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+  }
+  
+  #projects {
+    display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 1vw;
+      max-width: 995px;
+      margin: 10vh auto 10vh;
+      padding: 20px 10px;  
+  }
+  
+  .project-tile {
+      width: 300px;
+      height: 300px;
+  }
+  
+  #projects img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+    
+   #projects::after {
+      content: "";
+      width: 350px;
+    }
+  
+  .project-tile:hover {
+     position: relative;
+     bottom: 0.9vw;
+     transition: 0.5s ease;
+  }
+  
+  #project-hidden {
+      width: 100%;
+      height:10px;
+      position:relative;
+      bottom: 5vh;
+  }
+  
+  #div-social {
+      border: 1px solid #e8e9eb;
+      width: 100%;
+      height: 100vh;
+      position: flex;
+      justify-content: center;
+      text-align: center;
+      margin-top: 20vh;
+  }
+  
+  #div-links {
+      width: 100%;
+      height: 15vh;
+      margin: 25% 0;   
+  }
+  
+  .social-logos {
+      width: 15vh;
+      height: 15vh;
+      cursor: pointer;
+  }
+  .x {
+      padding: 3.3vh;
+  }
+  
+  .instagram {
+      padding: 2.9vh;
+  }
+  
+  .email {
+      padding: 2.6vh;
+  }
+  
+  .telegram {
+      padding: 2.5vh;
+  }
+  
+  .messenger {
+      padding: 2vh 2.5vh 1.8vh 1.5vh;
+  }

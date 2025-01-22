@@ -1,0 +1,323 @@
+Sub DownloadCSVUsingSelenium()
+    Dim driver As New Selenium.WebDriver
+    Dim csvDLTags As Object
+    Dim tag As Object
+    Dim startDate As String
+    Dim endDate As String
+    Dim URL As String
+    Dim Username As String
+    Dim Password As String
+    Dim WebDriverPath As String
+    Dim dlFolder As String
+    Dim fixedValue As String
+    
+    ' Edge WebDriverのパスを設定
+    WebDriverPath = Range("F1").Value
+
+    ' ユーザー名、パスワードを取得
+    Username = Range("B1").Value
+    Password = Range("B2").Value
+    
+    pid = StartEdgeDriver(DriverPath:=WebDriverPath)
+    Set driver = CreateObject("Selenium.WebDriver")
+
+    driver.StartRemotely "http://localhost:17556/", "MicrosoftEdge"
+  
+    ' Webサイトにアクセス
+    URL = "???"
+    driver.Get URL
+
+
+    driver.FindElementByClass("btn-lg").Click
+
+    ' 商品管理画面を開く
+    driver.Get "https://5carto.com/d9431349ebcf4f/product"
+    
+    ' 詳細検索ボタン押下
+    Set detailTags = driver.FindElementsByTag("a")
+    For Each tag In detailTags
+        If tag.Text = "詳細検索" Then
+            tag.Click
+            Exit For
+        End If
+    Next tag
+    
+    driver.Wait 500
+        
+    ' 検索する対象の日付を設定
+    startDate = "00" & Year(Date) & "-" & Format(Month(Date), "00") & "-01"
+    endDate = "00" & Year(Date) & "-" & Format(Month(Date), "00") & "-" & Format(Day(Date), "00")
+    
+    ' 検索値を入力し検索
+    driver.FindElementById("admin_search_product_purchase_date_start").SendKeys startDate
+    driver.FindElementById("admin_search_product_purchase_date_end").SendKeys endDate
+    
+    ' 検索ボタン押下
+    Set searchTags = driver.FindElementsByTag("button")
+    For Each tag In searchTags
+        If tag.Text = "検索" Then
+            tag.Click
+            Exit For
+        End If
+    Next tag
+    
+    driver.Wait 500
+    
+    ' CSVダウンロード
+    Set csvDLTags = driver.FindElementsByTag("a")
+    For Each tag In csvDLTags
+        If tag.Text = "CSVダウンロード" Then
+            tag.Click
+            Exit For
+        End If
+    Next tag
+    
+    Call CopyCSVFromTempFolder("仕入れCSV", "product")
+    
+    ' 商品管理画面への再遷移
+    driver.Get "???"
+    
+    ' 詳細検索ボタン押下
+    Set detailTags = driver.FindElementsByTag("a")
+    For Each tag In detailTags
+        If tag.Text = "詳細検索" Then
+            tag.Click
+            Exit For
+        End If
+    Next tag
+    
+    driver.Wait 500
+    
+    ' 検索値を入力し検索
+    driver.FindElementById("admin_search_product_payment_date_start").SendKeys startDate
+    driver.FindElementById("admin_search_product_payment_date_end").SendKeys endDate
+    
+    ' 検索ボタン押下
+    Set searchTags = driver.FindElementsByTag("button")
+    For Each tag In searchTags
+        If tag.Text = "検索" Then
+            tag.Click
+            Exit For
+        End If
+    Next tag
+    
+    ' CSVダウンロード
+    Set csvDLTags = driver.FindElementsByTag("a")
+    For Each tag In csvDLTags
+        If tag.Text = "CSVダウンロード" Then
+            tag.Click
+            Exit For
+        End If
+    Next tag
+    
+    Call CopyCSVFromTempFolder("商品管理CSV", "product")
+
+    ' 注文画面への遷移
+    driver.Get "???"
+    
+    ' 詳細検索ボタン押下
+    Set detailTags = driver.FindElementsByTag("a")
+    For Each tag In detailTags
+        If tag.Text = "詳細検索" Then
+            tag.Click
+            Exit For
+        End If
+    Next tag
+    
+    driver.Wait 500
+    
+    ' 検索値を入力し検索
+    driver.FindElementById("admin_search_order_payment_date_start").SendKeys startDate
+    driver.FindElementById("admin_search_order_payment_date_end").SendKeys endDate
+    
+    ' 検索ボタン押下
+    Set searchTags = driver.FindElementsByTag("button")
+    For Each tag In searchTags
+        If tag.Text = "検索" Then
+            tag.Click
+            Exit For
+        End If
+    Next tag
+        
+    ' CSVダウンロード
+    Set csvDLTags = driver.FindElementsByTag("button")
+    For Each tag In csvDLTags
+        If tag.Text = "CSVダウンロード" Then
+            tag.Click
+            
+                Set jyuchuTags = driver.FindElementsByTag("a")
+    For Each tag_2 In jyuchuTags
+        If tag_2.Text = "受注CSV" Then
+            tag_2.Click
+            Exit For
+        End If
+    Next tag_2
+            
+            Exit For
+        End If
+    Next tag
+    
+    Call CopyCSVFromTempFolder("受注管理CSV", "order")
+
+    ' Seleniumドライバを閉じる
+    driver.Quit
+    TerminateEdgeDriver (pid)
+    
+End Sub
+
+Sub CopyCSVFromTempFolder(sheetName As String, FileType As String)
+    Application.Wait Now + TimeValue("0:00:02")
+    
+    Dim fso As Object
+    Dim folder As Object
+    Dim files As Object
+    Dim latestFile As Object
+    Dim FilePath As String
+    Dim ExcelApp As Object
+    Dim ExcelWorkbook As Object
+    Dim Sheet As Worksheet
+    Dim fileName As String
+    
+    ' CSVファイルのパスを指定
+    dlFolder = Range("F2").Value
+    ' CSVファイルのパスを指定
+    fileNamePattern = FileType & "_" & Format(Now, "yyyymmdd") & "*.csv"
+    
+    
+    ' FileSystemObjectを作成します
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    
+    ' ダウンロードフォルダを開きます
+    Set folder = fso.GetFolder(dlFolder)
+    
+    ' ファイルのコレクションを取得します
+    Set files = folder.files
+    
+    ' 最新のファイルを見つけます
+    If Not IsEmpty(files) Then
+        For Each file In files
+            If file.Name Like fileNamePattern Then
+                If latestFile Is Nothing Then
+                    Set latestFile = file
+                Else
+                    If file.DateLastModified > latestFile.DateLastModified Then
+                        Set latestFile = file
+                    End If
+                End If
+            End If
+        Next file
+        
+        If Not latestFile Is Nothing Then
+            fileName = latestFile.Name
+        
+            ' オブジェクトを解放します
+            Set fso = Nothing
+            Set folder = Nothing
+            Set files = Nothing
+            Set latestFile = Nothing
+            
+            FilePath = dlFolder & "\" & fileName
+            
+            ' Excelアプリケーションを開く
+            Set ExcelApp = CreateObject("Excel.Application")
+            
+            ' CSVファイルをExcelで開く
+            Set ExcelWorkbook = ExcelApp.Workbooks.Open(FilePath)
+            
+            ' 貼り付け対象のシートを取得
+            ThisWorkbook.Sheets(sheetName).Activate
+            Set Sheet = ThisWorkbook.Sheets(sheetName)
+            ' シートの内容をいったん削除
+            Sheet.UsedRange.ClearContents
+            
+            Application.Wait Now + TimeValue("0:00:01")
+            
+            ' CSVファイルの内容を選択してコピー
+            ExcelWorkbook.Sheets(1).UsedRange.Copy
+            
+            Application.Wait Now + TimeValue("0:00:01")
+            ' アクティブなシートのA1に貼り付け
+            ThisWorkbook.Sheets(sheetName).Range("A1").Select
+            Sheet.Paste
+            
+            'クリップボードに情報が残っているエラーが出るので小さい領域をコピーしなおす
+            ExcelWorkbook.Sheets(1).Cells(1, 1).Copy
+            
+            ' Excelファイルを閉じる
+            ExcelWorkbook.Close False
+            ExcelApp.Quit
+            
+            ' オブジェクトの解放
+            Set ExcelWorkbook = Nothing
+            Set ExcelApp = Nothing
+            
+            If Dir(FilePath) <> "" Then
+                ' ファイルを削除します
+                Kill FilePath
+            End If
+        End If
+    End If
+End Sub
+
+Private Function StartEdgeDriver( _
+  ByVal DriverPath As String, _
+  Optional ByVal PortNo As Long = 17556) As Long
+   
+  Dim DriverFolderPath As String
+  Dim DriverName As String
+  Dim Options As String
+  Dim itm As Object, itms As Object
+  Dim pid As Long: pid = 0
+   
+  With CreateObject("Scripting.FileSystemObject")
+    If .FileExists(DriverPath) = False Then GoTo Fin
+    DriverFolderPath = .GetParentFolderName(DriverPath)
+    DriverName = .GetFileName(DriverPath)
+  End With
+    
+  '多重起動確認
+  Set itms = CreateObject("WbemScripting.SWbemLocator").ConnectServer.ExecQuery _
+             ("Select * From Win32_Process Where Name = '" & DriverName & "'")
+  If itms.Count > 0 Then
+    For Each itm In itms
+      pid = itm.ProcessId: GoTo Fin
+    Next
+  End If
+   
+  'WebDriver実行
+  Options = " --host=localhost --jwp --port=" & PortNo
+  With CreateObject("WbemScripting.SWbemLocator").ConnectServer.Get("Win32_Process")
+    .Create DriverPath & Options, DriverFolderPath, Null, pid
+  End With
+   
+Fin:
+  StartEdgeDriver = pid
+End Function
+ 
+Private Sub TerminateEdgeDriver(ByVal ProcessId As Long)
+  Dim itm As Object, itms As Object
+    
+  Set itms = CreateObject("WbemScripting.SWbemLocator").ConnectServer.ExecQuery _
+             ("Select * From Win32_Process Where ProcessId = " & ProcessId & "")
+  If itms.Count > 0 Then
+    For Each itm In itms
+      itm.Terminate: Exit For
+    Next
+  End If
+End Sub
+
+Private Function clickButton(ByVal tagName As String, ByVal targetText As String)
+    Set targetTags = driver.FindElementsByTagName(tagName)
+    For Each tag In targetTags
+        If tag.Text = targetText Then
+            tag.Click
+            Exit For
+        End If
+    Next tag
+End Function
+
+
+
+
+
+

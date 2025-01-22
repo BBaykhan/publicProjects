@@ -1,0 +1,115 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box !important;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    * {
+      scroll-behavior: smooth;
+    }
+  }
+  @media (max-width:1200px){
+    #main-doc {
+      width:calc(100% - 420px);
+      margin-left: 420px;
+      text-align: right;
+    }
+    .main-section {
+      width: 100%;
+    }
+  }
+  body {
+    width:100%;
+    background-color:#9a9a9a;
+    
+  }
+  #main-doc {
+    position: absolute;
+    right: 3px;
+    top: 3px;
+    /* border: 1px solid red; */
+    padding: 15px;
+    background-color:#eeeeee;
+    margin-left: 420px;
+    width: calc(100% - 420px);
+  }
+  #navbar {
+    display:block;
+    position: fixed;
+    top: 3px;
+    /* border: 1px solid black; */
+    margin-left: 12px;
+    padding: 10px;
+    height: 100vh;
+    width: 400px;
+    background-color:#eeeeee;
+  }
+  #main-header {
+    text-align: center;
+    font-family: luminary, fantasy; 
+    font-size: 35px;
+    font-weight: normal;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 5px solid #4d4d4d;
+  }
+  section header, code {
+    font-size: 25px;
+    font-family: optima, sans-serif;
+    margin-bottom: 35px;
+  }
+  p {
+    font-size: 18px;
+    /* margin-bottom: 100px; */
+    padding-bottom: 80px;
+    border-bottom: 5px solid #4d4d4d;
+  }
+  li {
+    height: 50px;
+    width:100%;
+    /* border: 1px solid; */
+    text-align: center;
+    list-style-type: none;
+    padding: 0;
+    
+  }
+  li a{
+    display: block;
+    width:100%;
+    text-align: left;
+    box-sizing: border-box;
+    white-space: normal;
+    /* border: 1px solid red; */
+    text-decoration: none;
+    padding-left: 5px;
+    line-height: 48px;
+    font-family: optima, sans-serif;
+  }
+  #navbar_header {
+    height: 100vh;
+  }
+  .nav-link {
+    height: auto;
+  }
+  a:hover {
+    background-color: #cccccc;
+  }
+  a:visited {
+    color: #1a1a1a;
+  }
+  a:active {
+    color: #808080;
+  }
+  .mendo {
+    text-align: inherit;
+    margin-top:inherit;
+  }
+  .mendo:last-of-type {
+  padding-bottom: 80px
+  }
+  section header {
+    margin-top: 80px;
+  }
+  .mendo1 {
+    padding-top: 80px;
+  }

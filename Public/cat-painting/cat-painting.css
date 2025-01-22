@@ -1,0 +1,111 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+#background {
+  position: fixed;
+  width: 100vw;
+  top: 2%;
+}
+#whiteScrn {
+  position: fixed;
+  width: 55%;
+  height: 51%;
+  top: 17%;
+  left: 22.5%;
+  border-radius: 3px;
+  background-color: white;
+  border: 1px solid black;
+}
+#numbers {
+  width: 20%;
+  height: 20%;
+  position: fixed;
+  border-collapse: collapse;
+  top: 38%;
+  left: 25%;
+  text-align: center;
+}
+#numbers td{
+  border: 2px solid grey;
+  text-align: center;
+  font-size: 1.5rem;
+}
+#cash {
+  position: fixed;
+  top:31%;
+  left: 25%;
+  height: 5%;
+  width: 20%;
+  text-align: center;
+  font-size: 1.5rem;
+}
+#dollar {
+  position: fixed;
+  left: 43.8%;
+  top: 31.3%;
+  font-size: 2rem;
+  background-color: white;
+}
+#priceDiv {
+  position: fixed;
+  width: 50%;
+  height: 10%;
+  top: 19%;
+  left: 25%;
+  border: 1px solid #c1c1c1;
+  border-radius: 3px;
+  background-color: #efefef;
+}
+#purchase-btn {
+  position: fixed;
+  left: 35%;
+  top: 60%;
+  height: 5%;
+  width: 10%;
+  color: #ff5151;
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+#cash-drawer-display {
+  position: fixed;
+  top: 31%;
+  left: 48%;
+  border: 1px solid #c1c1c1;
+  border-radius: 3px;
+  background-color: #efefef;
+  height: 34%;
+  width: 12%;
+  text-align: right;
+  padding: 7px 5px 0;
+  word-wrap: break-word;
+}
+#change-due {
+  position:fixed;
+  top: 31%;
+  left: 63%;
+  border: 1px solid #c1c1c1;
+  border-radius: 3px;
+  height: 34%;
+  width: 12%;
+  text-align: right;
+   padding: 7px 5px 0;
+   word-wrap: break-word;
+  /* background-color: #efefef; */
+}
+#priceText {
+  position:fixed;
+  top: 20.5%;
+  left: 40%;
+  z-index: 10;
+  font-size: 3rem;
+}
+#price-screen {
+  position:fixed;
+  top: 21.4%;
+  right: 28%;
+  font-size: 2.5rem;
+}
