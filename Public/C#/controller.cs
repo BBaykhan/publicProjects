@@ -11,11 +11,21 @@ public class PlayerController : MonoBehaviour
     private Vector2 input;
     
     private void Update()
+    private Animator animator;
+    private void Awake() {
+        animator = GetComponent<Animator>();
+    }
     {
         if (!isMoving)
         {
             input.x = Input.GetAxisRaw("Horizontal");
             input.y = Input.GetAxisRaw("Vertical");
+
+            Debug.Log("This is input.x" + input.x);
+            Debug.Log("This is input.y" + input.y);
+
+            animator.SetFloat("moveX", input.x);
+            animator.SetFloat("moveY", input.y);
 
             if (input != Vector2.zero)
             {
